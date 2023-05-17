@@ -14,13 +14,12 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
       void router.push("/auth");
     },
   });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (status === "loading") return null;
   return (
     <>
       <Sidebar />
-      <div>
+      <div className="z-1">
         <div className="lg:pl-72">
           <Nav user={data.user} />
           {children}

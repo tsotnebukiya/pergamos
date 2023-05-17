@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "./newUI/Button";
+import { Button } from "./UI/Button";
 import { HomeIcon } from "@heroicons/react/24/outline";
 
 const BreadCrumbs: React.FC<{ pages: { name: string; href: string }[] }> = ({
@@ -9,7 +9,7 @@ const BreadCrumbs: React.FC<{ pages: { name: string; href: string }[] }> = ({
     <nav className="flex border-b" aria-label="Breadcrumb">
       <ol
         role="list"
-        className="mx-auto flex w-full space-x-4 px-4 sm:px-6 lg:px-8"
+        className=" mx-auto flex w-full space-x-4 px-4 sm:px-6 lg:px-8"
       >
         <li className="flex">
           <div className="flex items-center">

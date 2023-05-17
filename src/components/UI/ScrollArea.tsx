@@ -1,6 +1,6 @@
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
-import { cn } from "pergamos/lib/utils";
+import { cn } from "pergamos/utils/utils";
 import { forwardRef } from "react";
 
 const ScrollArea = forwardRef<

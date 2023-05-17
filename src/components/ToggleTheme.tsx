@@ -90,15 +90,15 @@ import { useTheme } from "next-themes";
 
 // export default ToggleTheme;
 
-import { Button } from "./newUI/Button";
+import { Button } from "./UI/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./newUI/DropDownMenu";
+} from "./UI/DropDownMenu";
 
-import { Icons } from "./newUI/Icons";
+import { Icons } from "./UI/Icons";
 
 export function ModeToggle() {
   const { setTheme } = useTheme();

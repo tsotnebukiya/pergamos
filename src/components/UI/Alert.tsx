@@ -1,69 +1,59 @@
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
-import { ExclamationTriangleIcon } from "@heroicons/react/20/solid";
-import { XCircleIcon } from "@heroicons/react/20/solid";
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
+import * as React from "react";
+import { VariantProps, cva } from "class-variance-authority";
 
-type AlertType = "success" | "error" | "warning" | "info";
+import { cn } from "pergamos/utils/utils";
 
-type AlertProps = {
-  text: string;
-  type: AlertType;
-};
-
-const styles = (type: AlertType) => {
-  switch (type) {
-    case "success":
-      return "green";
-    case "error":
-      return "red";
-    case "warning":
-      return "yellow";
-    case "info":
-      return "blue";
+const alertVariants = cva(
+  "relative w-full rounded-lg border p-4 [&>svg]:absolute [&>svg]:text-foreground [&>svg]:left-4 [&>svg]:top-4 [&>svg+div]:translate-y-[-3px] [&:has(svg)]:pl-11",
+  {
+    variants: {
+      variant: {
+        default: "bg-background text-foreground",
+        destructive:
+          "text-destructive border-destructive/50 dark:border-destructive [&>svg]:text-destructive text-destructive",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
   }
-};
+);
 
-const Alert: React.FC<AlertProps> = ({ text, type }) => {
-  const color = styles(type);
-  return (
-    <div
-      className={`border-l-4 border-${color}-400 bg-${color}-50 p-4 dark:border-gray-700 dark:bg-gray-800`}
-    >
-      <div className="flex">
-        <div className="flex-shrink-0">
-          {color === "yellow" && (
-            <ExclamationTriangleIcon
-              className={`h-5 w-5 text-yellow-400 dark:text-yellow-500`}
-              aria-hidden="true"
-            />
-          )}
-          {color === "green" && (
-            <CheckCircleIcon
-              className={`h-5 w-5 text-green-400 dark:text-green-500`}
-              aria-hidden="true"
-            />
-          )}
-          {color === "red" && (
-            <XCircleIcon
-              className={`h-5 w-5 text-red-400 dark:text-red-500`}
-              aria-hidden="true"
-            />
-          )}
-          {color === "blue" && (
-            <InformationCircleIcon
-              className={`h-5 w-5 text-blue-400 dark:text-blue-500`}
-              aria-hidden="true"
-            />
-          )}
-        </div>
-        <div className="ml-3">
-          <h3 className={`text-sm text-${color}-700 dark:text-white`}>
-            {text}
-          </h3>
-        </div>
-      </div>
-    </div>
-  );
-};
+const Alert = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
+>(({ className, variant, ...props }, ref) => (
+  <div
+    ref={ref}
+    role="alert"
+    className={cn(alertVariants({ variant }), className)}
+    {...props}
+  />
+));
+Alert.displayName = "Alert";
 
-export default Alert;
+const AlertTitle = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h5
+    ref={ref}
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    {...props}
+  />
+));
+AlertTitle.displayName = "AlertTitle";
+
+const AlertDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    {...props}
+  />
+));
+AlertDescription.displayName = "AlertDescription";
+
+export { Alert, AlertTitle, AlertDescription };

@@ -1,7 +1,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 
-import { cn } from "pergamos/lib/utils";
+import { cn } from "pergamos/utils/utils";
 import { forwardRef } from "react";
 
 const buttonVariants = cva(

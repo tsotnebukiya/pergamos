@@ -3,8 +3,8 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import { Avatar, AvatarFallback, AvatarImage } from "../newUI/Avatar";
-import { Button } from "../newUI/Button";
+import { Avatar, AvatarFallback, AvatarImage } from "../UI/Avatar";
+import { Button } from "../UI/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,9 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "../newUI/DropDownMenu";
+} from "../UI/DropDownMenu";
 import type { User } from "next-auth";
 import { signOut } from "next-auth/react";
 
@@ -46,7 +45,6 @@ const UserNav: React.FC<User> = ({ email, image, name }) => {
           <DropdownMenuItem>
             <UserCircleIcon className="mr-2 h-6 w-6" />
             <span>Profile</span>
-            {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
@@ -54,7 +52,6 @@ const UserNav: React.FC<User> = ({ email, image, name }) => {
           <DropdownMenuItem>
             <ArrowLeftOnRectangleIcon className="mr-2 h-6 w-6" />
             <span>Log out</span>
-            {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
           </DropdownMenuItem>
         </button>
       </DropdownMenuContent>

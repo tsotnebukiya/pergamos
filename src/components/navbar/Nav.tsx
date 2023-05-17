@@ -1,4 +1,3 @@
-import type { Dispatch, SetStateAction } from "react";
 import { Search } from "./Search";
 import type { User } from "next-auth";
 import { ModeToggle } from "../ToggleTheme";
@@ -8,11 +7,10 @@ import UserNav from "./UserNav";
 const Nav: React.FC<{
   user: User;
 }> = ({ user }) => {
-  console.log(user);
   return (
     <div
-      className="sticky top-0 z-40
-     flex h-16 shrink-0 items-center border-b  px-4 "
+      className="sticky top-0 z-50
+     flex h-16 shrink-0 items-center border-b  bg-background px-4"
     >
       <div className="flex w-full items-center gap-x-4 self-stretch lg:gap-x-6">
         <div className="flex flex-1 justify-center">

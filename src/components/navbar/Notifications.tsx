@@ -1,5 +1,5 @@
 import { BellIcon } from "@heroicons/react/24/outline";
-import { Button } from "../newUI/Button";
+import { Button } from "../UI/Button";
 
 const Notifications: React.FC = () => {
   return (

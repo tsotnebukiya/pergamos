@@ -1,4 +1,4 @@
-import Input from "../newUI/Input";
+import { Input } from "../UI/Input";
 
 export function Search() {
   return (

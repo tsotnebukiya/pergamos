@@ -1,67 +1,101 @@
 import type { ReactElement } from "react";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
 import type { NextPageWithLayout } from "pergamos/utils/types";
 import DashboardLayout from "pergamos/components/layouts/DashboardLayout";
 import BreadCrumbs from "pergamos/components/Breadcrumbs";
-import PageHeader from "pergamos/components/UI/PageHeader";
-import Grid from "pergamos/components/UI/Grid";
-import BanksList from "pergamos/components/bankLayout/BanksList";
-import Link from "next/link";
-import Button from "pergamos/components/UI/ButtonStyle";
 import { api } from "pergamos/utils/api";
-import { GetServerSideProps } from "next";
+import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
-import DataTable from "pergamos/components/newUI/DataTable";
+import BanksDataTable from "pergamos/components/bankLayout/BanksDataTable";
 
-type Bank = {
-  id: number;
-  name: string;
-  active: boolean;
-  brokers: number;
-};
-
-const columns: ColumnDef<Bank>[] = [
+const tasks = [
   {
-    accessorKey: "id",
-    header: "ID",
+    id: "TASK-8782",
+    title:
+      "You can't compress the program without quantifying the open-source SSD pixel!",
+    status: "in progress",
+    label: "documentation",
+    priority: "medium",
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    id: "TASK-7878",
+    title:
+      "Try to calculate the EXE feed, maybe it will index the multi-byte pixel!",
+    status: "backlog",
+    label: "documentation",
+    priority: "medium",
   },
   {
-    accessorKey: "active",
-    header: "Active",
+    id: "TASK-7839",
+    title: "We need to bypass the neural TCP card!",
+    status: "todo",
+    label: "bug",
+    priority: "high",
   },
   {
-    accessorKey: "brokers",
-    header: "Brokers",
+    id: "TASK-5562",
+    title:
+      "The SAS interface is down, bypass the open-source pixel so we can back up the PNG bandwidth!",
+    status: "backlog",
+    label: "feature",
+    priority: "medium",
+  },
+  {
+    id: "TASK-8686",
+    title:
+      "I'll parse the wireless SSL protocol, that should driver the API panel!",
+    status: "canceled",
+    label: "feature",
+    priority: "medium",
+  },
+  {
+    id: "TASK-1280",
+    title:
+      "Use the digital TLS panel, then you can transmit the haptic system!",
+    status: "done",
+    label: "bug",
+    priority: "high",
+  },
+  {
+    id: "TASK-7262",
+    title:
+      "The UTF8 application is down, parse the neural bandwidth so we can back up the PNG firewall!",
+    status: "done",
+    label: "feature",
+    priority: "high",
+  },
+  {
+    id: "TASK-1138",
+    title:
+      "Generating the driver won't do anything, we need to quantify the 1080p SMTP bandwidth!",
+    status: "in progress",
+    label: "feature",
+    priority: "medium",
+  },
+  {
+    id: "TASK-7184",
+    title: "We need to program the back-end THX pixel!",
+    status: "todo",
+    label: "feature",
+    priority: "low",
+  },
+  {
+    id: "TASK-5160",
+    title:
+      "Calculating the bus won't do anything, we need to navigate the back-end JSON protocol!",
+    status: "in progress",
+    label: "documentation",
+    priority: "high",
   },
 ];
-const banks = [{ id: 1, name: "Bank of America", active: true, brokers: 2 }];
 
 const BanksListPage: NextPageWithLayout = () => {
   const { data } = api.banks.getAll.useQuery();
   if (!data) return null;
-  console.log(data[0]?._count.teams);
   return (
     <main>
       <BreadCrumbs pages={[{ name: "Banks", href: "/dashboard/banks" }]} />
-      {/* <PageHeader heading="List of Banks">
-          <Link href={`/dashboard/banks/create`}>
-            <Button text="Create" />
-          </Link>
-        </PageHeader> */}
-      {/* <Grid>
-        <BanksList banks={data} />
-      </Grid> */}
-      <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={banks} />
+      <div className="container mx-auto py-6">
+        <BanksDataTable data={tasks} />
       </div>
     </main>
   );

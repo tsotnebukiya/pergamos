@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Example {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  email         String?    @unique
+  emailVerified DateTime?
+  image         String?
+  level         Int        @default(5)
+  role          Role       @default(USER)
+  teams         CitiTeam[] @relation("TeamMembers")
+  accounts      Account[]
+  sessions      Session[]
+  createdBanks  Bank[]     @relation("BankMaker")
+  checkedBanks  Bank[]     @relation("BankChecker")
+  createdTeams  BankTeam[] @relation("TeamMaker")
+  checkedTeams  BankTeam[] @relation("TeamChecker")
+  createdAudits BankAudit[]@relation("AuditMaker")
+  checkedAudits BankAudit[]@relation("AuditChecker")
+}
+
+model CitiTeam {
+  id        Int        @id @default(autoincrement())
+  name      String
+  members   User[]     @relation("TeamMembers")
+  bankTeams BankTeam[] @relation("BankTeamsToCitiTeam")
+}
+
+model Bank {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  image       String?
+  website     String        @unique
+  maker       String
+  checker     String?
+  amending    Boolean       @default(false)
+  active      Boolean       @default(false)
+  accounts    BankAccount[] @relation("BankAccounts")
+  teams       BankTeam[]    @relation("BankTeams")
+  makerUser   User          @relation("BankMaker", fields: [maker], references: [id])
+  checkerUser User?         @relation("BankChecker", fields: [checker], references: [id])
+  audits      BankAudit[]   @relation("BankAudits")
+
+  @@index([maker])
+  @@index([checker])
+}
+
+
+model BankAudit {
+  id        Int        @id @default(autoincrement())
+  bank      Int
+  maker     String
+  checker   String?
+  name      String?
+  website   String?
+  image     String?
+  status    Status     @default(PENDING)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  bankId    Bank     @relation("BankAudits",fields: [bank], references: [id])
+  makerUser User       @relation("AuditMaker", fields: [maker], references: [id])
+  checkerUser User?    @relation("AuditChecker", fields: [checker], references: [id])
+
+  @@index([bank])
+  @@index([maker])
+  @@index([checker])
+}
+
+model BankAccount {
+  id        Int        @id @default(autoincrement())
+  account   String
+  market    String
+  approved  Boolean    @default(false)
+  bank      Int
+  bankTeams BankTeam[]
+  bankId    Bank       @relation("BankAccounts", fields: [bank], references: [id])
+
+  @@unique([account, market])
+  @@index([bank])
+}
+
+model BankTeam {
+  id            Int            @id @default(autoincrement())
+  maker         String
+  checker       String?
+  approved      Boolean        @default(false)
+  bank          Int
+  assignedTeam  Int
+  citiTeam      CitiTeam       @relation("BankTeamsToCitiTeam", fields: [assignedTeam], references: [id])
+  contactEmails ContactEmail[]
+  accounts      BankAccount[]
+  contactPhones ContactPhone[]
+  bankId        Bank           @relation("BankTeams", fields: [bank], references: [id])
+  makerUser     User           @relation("TeamMaker", fields: [maker], references: [id])
+  checkerUser   User?          @relation("TeamChecker", fields: [checker], references: [id])
+
+  @@index([bank])
+  @@index([maker])
+  @@index([checker])
+  @@index([assignedTeam])
+}
+
+model ContactEmail {
+  id         String   @id @default(cuid())
+  email      String
+  bankTeam   Int
+  bankTeamId BankTeam @relation(fields: [bankTeam], references: [id])
+
+  @@index([bankTeam])
+}
+
+model ContactPhone {
+  id         String   @id @default(cuid())
+  phone      String
+  bankTeam   Int
+  bankTeamId BankTeam @relation(fields: [bankTeam], references: [id])
+
+  @@index([bankTeam])
+}
+
+model BankAccountToBankTeam {
+  A Int
+  B Int
+
+  @@unique([A, B], map: "_BankAccountToBankTeam_AB_unique")
+  @@index([B], map: "_BankAccountToBankTeam_B_index")
+  @@map("_BankAccountToBankTeam")
+}
+
+model TeamMembers {
+  A Int
+  B String
+
+  @@unique([A, B], map: "_TeamMembers_AB_unique")
+  @@index([B], map: "_TeamMembers_B_index")
+  @@map("_TeamMembers")
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}

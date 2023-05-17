@@ -1,5 +1,4 @@
-import MenuTransition from "../sidebar/SideMobile";
-import Sidebar from "../sidebar/Sidebar";
+import { Sidebar } from "../Sidebar";
 import Nav from "../navbar/Nav";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -20,11 +19,10 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   if (status === "loading") return null;
   return (
     <>
-      <MenuTransition onClose={setSidebarOpen} open={sidebarOpen} />
       <Sidebar />
       <div>
         <div className="lg:pl-72">
-          <Nav onOpen={setSidebarOpen} user={data.user} />
+          <Nav user={data.user} />
           {children}
         </div>
       </div>

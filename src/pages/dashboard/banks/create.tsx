@@ -2,7 +2,7 @@
 import { ReactElement, useState } from "react";
 import type { NextPageWithLayout } from "pergamos/utils/types";
 import DashboardLayout from "pergamos/components/layouts/DashboardLayout";
-import BreadCrumbs from "pergamos/components/navbar/Breadcrumbs";
+import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import Grid from "pergamos/components/UI/Grid";
 import Input from "pergamos/components/UI/Input";
 import { useForm, type SubmitHandler } from "react-hook-form";

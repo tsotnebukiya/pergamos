@@ -9,7 +9,7 @@ import BankDetails from "pergamos/components/bankLayout/BankDetails";
 import BankTeams from "pergamos/components/bankLayout/BankTeams";
 import { useRouter } from "next/router";
 import BankStats from "pergamos/components/bankLayout/BankStats";
-import BreadCrumbs from "pergamos/components/navbar/Breadcrumbs";
+import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import PageHeader from "pergamos/components/UI/PageHeader";
 import Link from "next/link";
 import Button from "pergamos/components/UI/ButtonStyle";
@@ -145,8 +145,8 @@ const bankDetails = {
 };
 
 const BrokerOverviewPage: NextPageWithLayout = () => {
-  const session = useSession()
-  console.log(session.data?.user.id)
+  const session = useSession();
+  console.log(session.data?.user.id);
   const query = useRouter().query.bankId as string;
   const [openActivate, setOpenActivate] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);

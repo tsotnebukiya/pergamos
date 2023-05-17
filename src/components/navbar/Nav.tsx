@@ -1,32 +1,33 @@
 import type { Dispatch, SetStateAction } from "react";
-import Search from "./Search";
-import UserActions from "./UserActions";
+import { Search } from "./Search";
 import type { User } from "next-auth";
+import { ModeToggle } from "../ToggleTheme";
+import Notifications from "./Notifications";
+import UserNav from "./UserNav";
 
 const Nav: React.FC<{
   user: User;
-  onOpen: Dispatch<SetStateAction<boolean>>;
 }> = ({ user }) => {
+  console.log(user);
   return (
     <div
       className="sticky top-0 z-40
-     flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm 
-     dark:border-white/10 dark:bg-black/10    sm:gap-x-6 sm:px-6 lg:px-8"
+     flex h-16 shrink-0 items-center border-b  px-4 "
     >
-      {/*
-       MobileMenuButton 
-      <button
-        type="button"
-        className="-m-2.5 p-2.5 text-gray-700 dark:text-gray-400 lg:hidden"
-        onClick={() => onOpen(true)}
-      >
-        <span className="sr-only">Open sidebar</span>
-        <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-      </button>
-      <div className="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" /> */}
-      <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-        <Search />
-        <UserActions user={user} />
+      <div className="flex w-full items-center gap-x-4 self-stretch lg:gap-x-6">
+        <div className="flex flex-1 justify-center">
+          <Search />
+        </div>
+
+        <div className="flex items-center gap-x-4">
+          <ModeToggle />
+          <Notifications />
+          <div
+            className="hidden  border-l lg:block lg:h-8 lg:w-px"
+            aria-hidden="true"
+          />
+          <UserNav {...user} />
+        </div>
       </div>
     </div>
   );

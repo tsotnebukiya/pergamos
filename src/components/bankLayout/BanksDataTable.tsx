@@ -25,7 +25,8 @@ import {
   DropdownMenuTrigger,
 } from "../UI/DropDownMenu";
 import { DataTable } from "../table/DataTable";
-import BankCreateSheet from "./BankCreateSheet";
+import BankCreateSheet from "./BankForm";
+import { Dispatch, SetStateAction } from "react";
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
 }
@@ -258,14 +259,21 @@ export const columns: ColumnDef<Task>[] = [
   },
 ];
 
-const BanksDataTable: React.FC<{ data: Task[] }> = ({ data }) => {
+const BanksDataTable: React.FC<{
+  data: Task[];
+  onClick: Dispatch<SetStateAction<boolean>>;
+}> = ({ data, onClick }) => {
   return (
     <DataTable
       columns={columns}
       data={data}
       selecting={false}
       filters={[statusFilter, priorityFilter]}
-      actions={<BankCreateSheet />}
+      actions={
+        <Button onClick={() => onClick(true)} className="h-8">
+          Add new
+        </Button>
+      }
     />
   );
 };

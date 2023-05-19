@@ -1,6 +1,5 @@
 import type { Bank } from "@prisma/client";
 import Link from "next/link";
-import Badge from "../UI/Badge";
 import { RouterOutputs } from "pergamos/utils/api";
 
 const BankDetailsRow: React.FC<{

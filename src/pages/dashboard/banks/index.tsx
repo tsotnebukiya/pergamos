@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { type ReactElement, useState } from "react";
 import type { NextPageWithLayout } from "pergamos/utils/types";
 import DashboardLayout from "pergamos/components/layouts/DashboardLayout";
 import BreadCrumbs from "pergamos/components/Breadcrumbs";
@@ -6,6 +6,8 @@ import { api } from "pergamos/utils/api";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
 import BanksDataTable from "pergamos/components/bankLayout/BanksDataTable";
+import BankForm from "pergamos/components/bankLayout/BankForm";
+import { useToast } from "pergamos/hooks/useToast";
 
 const tasks = [
   {
@@ -89,13 +91,15 @@ const tasks = [
 ];
 
 const BanksListPage: NextPageWithLayout = () => {
+  const [open, setOpen] = useState(false);
   const { data } = api.banks.getAll.useQuery();
   if (!data) return null;
   return (
     <main>
       <BreadCrumbs pages={[{ name: "Banks", href: "/dashboard/banks" }]} />
       <div className="container mx-auto py-6">
-        <BanksDataTable data={tasks} />
+        <BanksDataTable data={tasks} onClick={setOpen} />
+        {open && <BankForm open={open} setOpen={setOpen} />}
       </div>
     </main>
   );

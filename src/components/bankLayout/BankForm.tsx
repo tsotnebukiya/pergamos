@@ -6,41 +6,35 @@ import { Input } from "../UI/Input";
 import { Label } from "../UI/Label";
 import { Close as SheetClose } from "@radix-ui/react-dialog";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../UI/Sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../UI/Sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "../UI/Alert";
-import { useState } from "react";
-import Spinner from "../UI/Spinner";
+import { Dispatch, SetStateAction, useState } from "react";
 import { api } from "pergamos/utils/api";
-import { useToast } from "../UI/UseToast";
+import { useToast } from "pergamos/hooks/useToast";
 
 export const urlRegex =
   /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
 
-const schema = z
-  .object({
-    website: z.string().regex(urlRegex, "Invalid URL"),
-    name: z.string().min(5, "Name must be at least 3 characters long"),
-  })
-  .required();
+const schema = z.object({
+  website: z.string().regex(urlRegex, "Invalid URL"),
+  name: z.string().min(5, "Name must be at least 3 characters long"),
+});
 
-export type BankFormData = z.infer<typeof schema>;
+export type BankForm = z.infer<typeof schema>;
 
-const BankCreateSheet: React.FC = () => {
-  const [submitting, isSubmitting] = useState(false);
+const BankForm: React.FC<{
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}> = ({ open, setOpen }) => {
   const { toast } = useToast();
+  const [submitting, isSubmitting] = useState(false);
   const {
     handleSubmit,
     control,
     formState: { errors },
     reset,
-  } = useForm<BankFormData>({
+  } = useForm<BankForm>({
     resolver: zodResolver(schema),
     mode: "onBlur",
 
@@ -52,34 +46,40 @@ const BankCreateSheet: React.FC = () => {
   const { mutate } = api.banks.create.useMutation({
     onSettled: () => {
       isSubmitting(false);
+      setOpen(false);
     },
-    onSuccess: (val) => {
-      // toast.custom((t) => <Notify t={t} type="success" />);
+    onSuccess: () => {
+      toast({
+        variant: "default",
+        title: "Success",
+        description: "Bank created successfully",
+      });
       // void router.push(`/dashboard/banks/${val.id}`);
     },
     onError: (error) => {
-      // toast.custom((t) => <Notify t={t} type="error" text={error.message} />);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
     },
   });
-  const onSubmit: SubmitHandler<BankFormData> = (data) => {
-    isSubmitting(true);
-    toast({ title: "Creating Bank", description: "Please wait" });
-    // console.log(data);
+
+  const onSubmit: SubmitHandler<BankForm> = (data) => {
+    mutate(data);
   };
   return (
     <Sheet
       onOpenChange={(val) => {
-        !val && reset();
+        setOpen(val);
+        reset();
       }}
+      open={open}
     >
-      <Button variant={"default"} asChild className="h-8">
-        <SheetTrigger>Add New</SheetTrigger>
-      </Button>
-      <SheetContent size={"sm"}>
+      <SheetContent size={"sm"} onInteractOutside={() => setOpen(false)}>
+        <SheetTitle className="p-6">Add bank</SheetTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <SheetHeader>
-            <SheetTitle className="p-6">Add bank</SheetTitle>
-
             <CardContent className="grid gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
@@ -90,7 +90,7 @@ const BankCreateSheet: React.FC = () => {
                     <Input placeholder="Bank Name" required {...field} />
                   )}
                 />
-                {errors.name && (
+                {errors.name && open && (
                   <Alert variant={"destructive"} className="mt-1">
                     {errors.name.message}
                   </Alert>
@@ -109,7 +109,7 @@ const BankCreateSheet: React.FC = () => {
                     />
                   )}
                 />
-                {errors.website && (
+                {errors.website && open && (
                   <Alert variant={"destructive"} className="mt-1">
                     {errors.website.message}
                   </Alert>
@@ -118,13 +118,13 @@ const BankCreateSheet: React.FC = () => {
             </CardContent>
             <CardFooter className="justify-between space-x-2">
               <Button variant="outline" asChild>
-                <SheetClose>Close </SheetClose>
+                <button type="button" onMouseDown={() => setOpen(false)}>
+                  Close
+                </button>
               </Button>
               <Button type="submit" disabled={submitting}>
-                {submitting && <Spinner />}
                 <div className="flex items-center gap-2">
-                  Submitting
-                  <Spinner />
+                  {submitting ? "Submitting" : "Submit"}
                 </div>
               </Button>
             </CardFooter>
@@ -135,4 +135,4 @@ const BankCreateSheet: React.FC = () => {
   );
 };
 
-export default BankCreateSheet;
+export default BankForm;

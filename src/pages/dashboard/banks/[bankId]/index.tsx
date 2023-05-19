@@ -10,18 +10,22 @@ import BankTeams from "pergamos/components/bankLayout/BankTeams";
 import { useRouter } from "next/router";
 import BankStats from "pergamos/components/bankLayout/BankStats";
 import BreadCrumbs from "pergamos/components/Breadcrumbs";
-import PageHeader from "pergamos/components/UI/PageHeader";
 import Link from "next/link";
-import Button from "pergamos/components/UI/ButtonStyle";
-import Grid from "pergamos/components/UI/Grid";
 import type { GetServerSideProps } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "pergamos/server/api/root";
-import Modal from "pergamos/components/overlays/Modal";
 import { toast } from "react-hot-toast";
-import Notify from "pergamos/components/overlays/Toast";
 import { createHelpers } from "pergamos/utils/helpers";
 import { useSession } from "next-auth/react";
+import { Button } from "pergamos/components/UI/Button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "pergamos/components/UI/Card";
+import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 
 const bankDetails = {
   name: "Bank of America",
@@ -155,10 +159,10 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
   const { mutate: mutateBank } = api.banks.activate.useMutation({
     onSuccess: () => {
       void ctx.banks.getOne.invalidate({ id: Number(query) });
-      toast.custom((t) => <Notify t={t} type="success" />);
+      // toast.custom((t) => <Notify t={t} type="success" />);
     },
     onError: (err) => {
-      toast.custom((t) => <Notify t={t} type="error" text={err.message} />);
+      // toast.custom((t) => <Notify t={t} type="error" text={err.message} />);
     },
   });
   const { mutate: mutateCheck } = api.banks.amendChecker.useMutation({
@@ -167,10 +171,10 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
     },
     onSuccess: () => {
       void ctx.banks.getOne.invalidate({ id: Number(query) });
-      toast.custom((t) => <Notify t={t} type="success" />);
+      // toast.custom((t) => <Notify t={t} type="success" />);
     },
     onError: (err) => {
-      toast.custom((t) => <Notify t={t} type="error" text={err.message} />);
+      // toast.custom((t) => <Notify t={t} type="error" text={err.message} />);
     },
   });
   const activateHandler = () => {
@@ -198,71 +202,88 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
   if (!data) return null;
   return (
     <main>
-      <BreadCrumbs
-        pages={[
-          { name: "Banks", href: "/dashboard/banks" },
-          { name: data.name, href: `/dashboard/banks/${query}` },
-        ]}
-      />
-      <PageHeader
-        heading={data.name}
-        image={
-          data.image
-            ? data.image
-            : "https://tailwindui.com/img/logos/48x48/tuple.svg"
-        }
-      >
-        {!data.active ? (
-          <button onClick={() => setOpenActivate(true)}>
-            <Button text="Activate" />
-          </button>
-        ) : data.amending ? (
-          <button onClick={() => setOpenApprove(true)}>
-            <Button text="Pending Changes" type="secondary" />
-          </button>
-        ) : (
-          <Link href={`/dashboard/banks/${query}/edit`}>
-            <Button text="Edit" />
-          </Link>
-        )}
-      </PageHeader>
-      <Grid>
-        {bankDetails.transactions === 0 || bankDetails.volume === 0 ? null : (
-          <BankStats
-            transactions={bankDetails.transactions}
-            volume={bankDetails.volume}
-            bankId={"2"}
-          />
-        )}
-
-        <BankDetails {...data} />
-        <BankTeams teams={bankDetails.teams} bankId={query} />
-      </Grid>
-      <Modal
-        actionText="Activate"
-        type="green"
-        heading="Activate Bank"
-        text={["Are you sure you want to activate this bank?"]}
-        open={openActivate}
-        setOpen={setOpenActivate}
-        action={activateHandler}
-      />
-      <Modal
-        actionText="Approve"
-        type="green"
-        heading="Amended Fields"
-        text={[
-          ...(data.audits[0]?.name ? [`Name: ${data.audits[0].name}`] : []),
-          ...(data.audits[0]?.website
-            ? [`Website: ${data.audits[0].website}`]
-            : []),
-        ]}
-        deactivationText="Reject"
-        deactivationAction={rejectHandler}
-        open={openApprove}
-        setOpen={setOpenApprove}
-        action={approveHandler}
-      />
+      <BreadCrumbs pages={[{ name: "Banks", href: "/dashboard/banks" }]} />
+      <div className="container mx-auto py-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight">Bank Name</h2>
+          <Button size="sm">Approve</Button>
+        </div>
+        <div className="space-y-4">
+          <div className="grid gap-4  md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$45,231.89</div>
+                <p className="text-xs text-muted-foreground">
+                  +20.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Subscriptions
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+2350</div>
+                <p className="text-xs text-muted-foreground">
+                  +180.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Sales</CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+12,234</div>
+                <p className="text-xs text-muted-foreground">
+                  +19% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Active Now
+                </CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+573</div>
+                <p className="text-xs text-muted-foreground">
+                  +201 since last hour
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>Brokers</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">{/* <Overview /> */}</CardContent>
+            </Card>
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle>Bank Details</CardTitle>
+                {/* <CardDescription>
+                      You made 265 sales this month.
+                    </CardDescription> */}
+              </CardHeader>
+              <CardContent>{/* <RecentSales /> */}</CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
     </main>
   );
 };

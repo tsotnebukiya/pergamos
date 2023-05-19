@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "pergamos/server/api/trpc";
-import { urlRegex } from "pergamos/pages/dashboard/banks/create";
 import { TRPCError } from "@trpc/server";
 
 // const MAX_SIZE = 500000; // 500kb
 // const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/jpg"];
-
+export const urlRegex =
+  /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
 export const banksRouter = createTRPCRouter({
   getOne: protectedProcedure
     .input(z.object({ id: z.number() }))
@@ -71,7 +71,6 @@ export const banksRouter = createTRPCRouter({
       z.object({
         website: z.string().regex(urlRegex, "Invalid URL"),
         name: z.string().min(5, "Name must be at least 5 characters long"),
-        // logo: z.any().refine((file)=>file.size <= MAX_SIZE, "File must be less than 500kb").refine((file)=>ACCEPTED_TYPES.includes(file.type),'Invalid file type')
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -141,7 +140,6 @@ export const banksRouter = createTRPCRouter({
           .object({
             name: z.string().optional(),
             website: z.string().optional(),
-            file: z.string().optional(),
           })
           .refine(
             (data) =>

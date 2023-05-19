@@ -5,7 +5,7 @@ import type { AppProps } from "next/app";
 import type { Session } from "next-auth";
 import type { NextPageWithLayout } from "pergamos/utils/types";
 import { ThemeProvider } from "next-themes";
-import { Toaster } from "../components/UI/Toaster";
+import { Toaster } from "pergamos/components/UI/Toaster";
 
 type AppPropsWithLayout = AppProps<{ session: Session | null }> & {
   Component: NextPageWithLayout;
@@ -26,8 +26,8 @@ const MyApp = ({
         enableSystem={false}
       >
         {layout}
+        <Toaster />
       </ThemeProvider>
-      <Toaster />
     </SessionProvider>
   );
 };

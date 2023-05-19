@@ -1,6 +1,3 @@
-import Alert from "../UI/Alert";
-import Logo from "../UI/Logo";
-
 interface AuthLayoutProps {
   googleAuth: (event: React.MouseEvent<HTMLButtonElement>) => void;
   githubAuth: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -15,9 +12,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className=" sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <Logo />
-        </div>
+        <div className="flex justify-center">Logo</div>
         <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Sign in to your account
         </h2>
@@ -63,9 +58,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               </button>
             </div>
           </div>
-          <div className="mt-6">
-            {error && <Alert text={error} type="error" />}
-          </div>
+          <div className="mt-6"></div>
         </div>
       </div>
     </div>

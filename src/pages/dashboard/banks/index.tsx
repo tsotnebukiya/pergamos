@@ -5,7 +5,7 @@ import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import { api } from "pergamos/utils/api";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
-import BanksDataTable from "pergamos/components/bankLayout/BanksDataTable";
+import BanksTable from "pergamos/components/bankLayout/BanksTable";
 import BankForm from "pergamos/components/bankLayout/BankForm";
 import { useToast } from "pergamos/hooks/useToast";
 
@@ -98,7 +98,7 @@ const BanksListPage: NextPageWithLayout = () => {
     <main>
       <BreadCrumbs pages={[{ name: "Banks", href: "/dashboard/banks" }]} />
       <div className="container mx-auto py-6">
-        <BanksDataTable data={tasks} onClick={setOpen} />
+        <BanksTable data={tasks} onClick={setOpen} />
         {open && <BankForm open={open} setOpen={setOpen} />}
       </div>
     </main>

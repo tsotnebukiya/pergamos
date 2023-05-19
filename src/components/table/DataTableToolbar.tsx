@@ -8,7 +8,7 @@ import { DataTableFacetedFilter } from "./DataTableFacetedFilter";
 export interface FilterOption {
   columnName: string;
   title: string;
-  options: { value: string; label: string; icon?: LucideIcon }[];
+  options: { value: string; label?: string; icon?: LucideIcon }[];
 }
 
 interface DataTableToolbarProps<TData> {

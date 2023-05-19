@@ -25,7 +25,6 @@ import {
   DropdownMenuTrigger,
 } from "../UI/DropDownMenu";
 import { DataTable } from "../table/DataTable";
-import BankCreateSheet from "./BankForm";
 import { Dispatch, SetStateAction } from "react";
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -139,7 +138,7 @@ const priorityFilter = {
   options: priorities,
 };
 
-export const taskSchema = z.object({
+const taskSchema = z.object({
   id: z.string(),
   title: z.string(),
   status: z.string(),
@@ -147,9 +146,9 @@ export const taskSchema = z.object({
   priority: z.string(),
 });
 
-export type Task = z.infer<typeof taskSchema>;
+type Task = z.infer<typeof taskSchema>;
 
-export const columns: ColumnDef<Task>[] = [
+const columns: ColumnDef<Task>[] = [
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -221,7 +220,7 @@ export const columns: ColumnDef<Task>[] = [
         </div>
       );
     },
-    filterFn: (row, id, value: string) => {
+    filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
   },
@@ -248,8 +247,7 @@ export const columns: ColumnDef<Task>[] = [
         </div>
       );
     },
-    filterFn: (row, id, value: string) => {
-      console.log(row, id, value);
+    filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
   },
@@ -259,7 +257,7 @@ export const columns: ColumnDef<Task>[] = [
   },
 ];
 
-const BanksDataTable: React.FC<{
+const BanksTable: React.FC<{
   data: Task[];
   onClick: Dispatch<SetStateAction<boolean>>;
 }> = ({ data, onClick }) => {
@@ -278,4 +276,4 @@ const BanksDataTable: React.FC<{
   );
 };
 
-export default BanksDataTable;
+export default BanksTable;

@@ -6,6 +6,7 @@ import type { Session } from "next-auth";
 import type { NextPageWithLayout } from "pergamos/utils/types";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "pergamos/components/UI/Toaster";
+import "/node_modules/flag-icons/css/flag-icons.min.css";
 
 type AppPropsWithLayout = AppProps<{ session: Session | null }> & {
   Component: NextPageWithLayout;

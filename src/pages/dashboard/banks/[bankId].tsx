@@ -20,28 +20,44 @@ import BankDetails from "pergamos/components/bankLayout/BankDetails";
 
 const brokers = [
   {
-    id: 1,
+    id: "5",
     title: "Broker 1",
-    assignedTeam: "Team 1",
-    account: "903",
+    accounts: ["903"],
+    market: "icsd",
+    assignedTeam: {
+      name: "ICSD team",
+      id: 1,
+    },
   },
   {
-    id: 2,
+    id: "2",
     title: "Broker 2",
-    assignedTeam: "Team 2",
-    account: "2653",
+    accounts: ["2653"],
+    market: "us",
+    assignedTeam: {
+      name: "ICSD team",
+      id: 1,
+    },
   },
   {
-    id: 4,
+    id: "4",
     title: "Broker 3",
-    assignedTeam: "Team 1",
-    account: "2412",
+    accounts: ["2412"],
+    market: "za",
+    assignedTeam: {
+      name: "ICSD team",
+      id: 1,
+    },
   },
   {
-    id: 5,
-    title: "Broker 5",
-    assignedTeam: "Team 3",
-    account: "3412",
+    id: "10",
+    title: "Broker 10",
+    accounts: ["3412", "2312", "3412"],
+    market: "uk",
+    assignedTeam: {
+      name: "ICSD team",
+      id: 1,
+    },
   },
 ];
 
@@ -123,6 +139,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
               cardClass2="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-2"
             />
             <BrokersTable
+              bankId={query}
               data={brokers}
               cardClass="col-span-1 md:col-span-2 lg:col-start-1 lg:col-span-5 lg:row-span-2 border-none shadow-none"
             />

@@ -25,24 +25,28 @@ import {
 } from "../UI/Table";
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar, type FilterOption } from "./DataTableToolbar";
+import { useRouter } from "next/router";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData extends { id: string }, TValue> {
+  columns: ColumnDef<TData, any>[];
   data: TData[];
+  link?: string;
   pageSize?: number;
   selecting?: boolean;
   filters?: FilterOption[];
   actions?: React.ReactNode;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: string }, TValue>({
   columns,
   data,
   pageSize,
   selecting,
   filters = [],
   actions,
+  link,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter();
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -77,6 +81,7 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+  console.log(table.getRowModel());
   return (
     <div className="space-y-4">
       <DataTableToolbar
@@ -110,6 +115,10 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={link && "cursor-pointer"}
+                  onClick={() => {
+                    void (link && router.push(`${link}/${row.original.id}`));
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

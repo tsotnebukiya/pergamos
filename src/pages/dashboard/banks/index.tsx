@@ -6,7 +6,7 @@ import { api } from "pergamos/utils/api";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
 import BanksTable from "pergamos/components/bankLayout/BanksTable";
-import BankForm from "pergamos/components/bankLayout/BankForm";
+import BankCreate from "pergamos/components/bankLayout/BankCreate";
 import { useToast } from "pergamos/hooks/useToast";
 
 const tasks = [
@@ -99,7 +99,7 @@ const BanksListPage: NextPageWithLayout = () => {
       <BreadCrumbs pages={[{ name: "Banks", href: "/dashboard/banks" }]} />
       <div className="container mx-auto py-6">
         <BanksTable data={tasks} onClick={setOpen} />
-        {open && <BankForm open={open} setOpen={setOpen} />}
+        {open && <BankCreate open={open} setOpen={setOpen} />}
       </div>
     </main>
   );

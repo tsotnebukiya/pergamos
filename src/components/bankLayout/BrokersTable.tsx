@@ -1,189 +1,146 @@
-import type { ColumnDef } from "@tanstack/react-table";
-
-import { Badge } from "../UI/Badge";
-import { Checkbox } from "../UI/Checkbox";
+import { type FilterFn, createColumnHelper } from "@tanstack/react-table";
+import {
+  RankingInfo,
+  rankItem,
+  compareItems,
+} from "@tanstack/match-sorter-utils";
+import { CustomFilterFns } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../table/DataTableColumnHeader";
 import { z } from "zod";
-import {
-  ArrowDownToLine,
-  ArrowRightToLine,
-  ArrowUpCircle,
-  ArrowUpToLine,
-  CheckCircle2,
-  Circle,
-  HelpCircle,
-  XCircle,
-} from "lucide-react";
-import type { Row } from "@tanstack/react-table";
-import { Copy, MoreHorizontal, Pen, Star, Trash } from "lucide-react";
-import { Button } from "../UI/Button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../UI/DropDownMenu";
 import { DataTable } from "../table/DataTable";
-import { Dispatch, SetStateAction } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card";
+import { Button } from "../UI/Button";
+import Link from "next/link";
 
-export const labels = [
-  {
-    value: "bug",
-    label: "Bug",
-  },
-  {
-    value: "feature",
-    label: "Feature",
-  },
-  {
-    value: "documentation",
-    label: "Documentation",
-  },
-];
-
-export const statuses = [
-  {
-    value: "backlog",
-    label: "Backlog",
-    icon: HelpCircle,
-  },
-  {
-    value: "todo",
-    label: "Todo",
-    icon: Circle,
-  },
-  {
-    value: "in progress",
-    label: "In Progress",
-    icon: ArrowUpCircle,
-  },
-  {
-    value: "done",
-    label: "Done",
-    icon: CheckCircle2,
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
-    icon: XCircle,
-  },
-];
-
-export const priorities = [
-  {
-    label: "Low",
-    value: "low",
-    icon: ArrowDownToLine,
-  },
-  {
-    label: "Medium",
-    value: "medium",
-    icon: ArrowRightToLine,
-  },
-  {
-    label: "High",
-    value: "high",
-    icon: ArrowUpToLine,
-  },
-];
-
-const statusFilter = {
-  columnName: "status",
-  title: "Status",
-  options: statuses,
+type Broker = {
+  id: string;
+  title: string;
+  market: string;
+  accounts: string[];
+  assignedTeam: {
+    name: string;
+    id: number;
+  };
 };
 
-const priorityFilter = {
-  columnName: "priority",
-  title: "Priority",
-  options: priorities,
-};
+const columnHelper = createColumnHelper<Broker>();
 
-export const brokerSchema = z.object({
-  id: z.number(),
-  title: z.string(),
-  account: z.string(),
-  assignedTeam: z.string(),
-});
-
-export type Broker = z.infer<typeof brokerSchema>;
-
-export const columns: ColumnDef<Broker>[] = [
-  {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Id" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("id")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "title",
+const columns = [
+  columnHelper.accessor("title", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => {
-      // const label = labels.find((label) => label.value === row.original.label);
+    cell: (props) => {
       return (
         <div className="flex space-x-2">
           <span className="max-w-[300px] truncate font-medium">
-            {row.getValue("title")}
+            {props.getValue()}
           </span>
         </div>
       );
     },
-  },
-  {
-    accessorKey: "account",
+    enableSorting: true,
+    enableHiding: false,
+  }),
+  columnHelper.accessor("accounts", {
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Account" />
+      <DataTableColumnHeader column={column} title="Accounts" />
     ),
-    cell: ({ row }) => {
+    cell: (props) => {
       return (
-        <div className="flex  items-center">
-          <span>{row.getValue("account")}</span>
+        <div className="flex space-x-2">
+          <div className="flex  items-center">
+            <span>
+              {props
+                .getValue()
+                .map((acc, index) => `${index > 0 ? " | " : ""}${acc}`)}
+            </span>
+          </div>
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const accountValues = row.getValue(id) as string[];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      return value.some((el: any) => accountValues.includes(el));
+    },
+    enableSorting: false,
+    enableHiding: false,
+  }),
+  columnHelper.accessor("market", {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Market" />
+    ),
+    cell: (props) => {
+      const value = props.getValue();
+      return (
+        <div className="flex space-x-2">
+          <span
+            className={`fi fi-${
+              value === "icsd" ? "un" : value === "uk" ? "gb" : value
+            }`}
+          />
+          <span className="truncate font-medium">{value.toUpperCase()}</span>
         </div>
       );
     },
     filterFn: (row, id, value) => {
       console.log(value, row.getValue(id));
-      return value.includes(row.getValue(id));
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const accountValues = row.getValue(id) as string;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      return value.includes(accountValues);
     },
-  },
-  {
-    accessorKey: "assignedTeam",
+    enableSorting: true,
+    enableHiding: false,
+  }),
+  columnHelper.accessor("assignedTeam", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Assigned Team" />
     ),
-    cell: ({ row }) => {
+    cell: (props) => {
       return (
-        <div className="flex items-center">
-          <span>{row.getValue("assignedTeam")}</span>
+        <div className="flex space-x-2">
+          <Link href={`/dashboard/teams/${props.getValue().id}`}>
+            <Button variant="link">
+              <span className="truncate font-medium">
+                {props.getValue().name}
+              </span>
+            </Button>
+          </Link>
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      console.log(row, id, value);
-      return value.includes(row.getValue(id));
-    },
-  },
+    enableSorting: true,
+    enableHiding: false,
+  }),
 ];
 
 const BrokersTable: React.FC<{
   data: Broker[];
   cardClass?: string;
-}> = ({ data, cardClass }) => {
-  const accounts = [
-    ...new Set(
-      data.map((broker) => ({
-        value: broker.account.toString(),
-      }))
-    ),
-  ];
-  console.log(accounts);
+  bankId: string;
+}> = ({ data, cardClass, bankId }) => {
+  const accounts = Array.from(
+    new Set(data.flatMap((broker) => broker.accounts))
+  ).map((value) => ({ value: value }));
+
+  const markets = Array.from(new Set(data.map((broker) => broker.market))).map(
+    (value) => ({
+      value: value,
+      label: (
+        <div className="flex space-x-2">
+          <span
+            className={`fi fi-${
+              value === "icsd" ? "un" : value === "uk" ? "gb" : value
+            }`}
+          />
+          <span className="truncate font-medium">{value.toUpperCase()}</span>
+        </div>
+      ),
+    })
+  );
   return (
     <Card className={cardClass}>
       <CardHeader>
@@ -195,9 +152,20 @@ const BrokersTable: React.FC<{
           data={data}
           selecting={false}
           pageSize={5}
+          link={`/dashboard/${bankId}/brokers`}
           filters={[
-            { columnName: "account", title: "Account", options: [...accounts] },
+            {
+              columnName: "accounts",
+              title: "Account",
+              options: [...accounts],
+            },
+            {
+              columnName: "market",
+              title: "Market",
+              options: [...markets],
+            },
           ]}
+          actions={<Button className="h-8">Add New</Button>}
         />
       </CardContent>
     </Card>

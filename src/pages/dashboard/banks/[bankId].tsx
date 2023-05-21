@@ -3,30 +3,21 @@ import type { NextPageWithLayout } from "pergamos/utils/types";
 import DashboardLayout from "pergamos/components/layouts/DashboardLayout";
 import { api } from "pergamos/utils/api";
 import { useRouter } from "next/router";
-import BankStats from "pergamos/components/bankLayout/BankStats";
 import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
-import { useSession } from "next-auth/react";
 import { Button } from "pergamos/components/UI/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "pergamos/components/UI/Card";
 import BrokersTable from "pergamos/components/brokers/BrokersTable";
 import BankDetails from "pergamos/components/bankLayout/BankDetails";
-import EmptyState from "pergamos/components/UI/EmptyState";
-import BankCreate from "pergamos/components/bankLayout/BankCreate";
 import BrokerCreate from "pergamos/components/brokers/BrokerCreate";
 import BankAmend from "pergamos/components/bankLayout/BankAmend";
-import BankApprove from "pergamos/components/bankLayout/BankApprove";
+import BankApprove from "pergamos/components/bankLayout/BankAmendApprove";
+import BankActivate from "pergamos/components/bankLayout/BankActivate";
 
 const brokers = [
   {
     id: "5",
-    title: "Broker 1",
+    name: "Broker 1",
     accounts: ["903"],
     market: "icsd",
     assignedTeam: {
@@ -36,7 +27,7 @@ const brokers = [
   },
   {
     id: "2",
-    title: "Broker 2",
+    name: "Broker 2",
     accounts: ["2653"],
     market: "us",
     assignedTeam: {
@@ -46,7 +37,7 @@ const brokers = [
   },
   {
     id: "4",
-    title: "Broker 3",
+    name: "Broker 3",
     accounts: ["2412"],
     market: "za",
     assignedTeam: {
@@ -56,7 +47,7 @@ const brokers = [
   },
   {
     id: "10",
-    title: "Broker 10",
+    name: "Broker 10",
     accounts: ["3412", "2312", "3412"],
     market: "uk",
     assignedTeam: {
@@ -70,6 +61,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
   const [openBrokerCreate, setOpenBrokerCreate] = useState(false);
   const [openBankdAmend, setOpenBankAmend] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);
+  const [openActivate, setOpenActivate] = useState(false);
   const query = useRouter().query.bankId as string;
   const { data } = api.banks.getOne.useQuery({ id: Number(query) });
   if (!data) return null;
@@ -80,7 +72,9 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">{data.name}</h2>
           {!data.active ? (
-            <Button size="sm">Approve</Button>
+            <Button size="sm" onClick={() => setOpenActivate(true)}>
+              Activate
+            </Button>
           ) : data.amending ? (
             <Button
               size="sm"
@@ -103,12 +97,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
             <BankDetails
-              active={data.active}
-              makerId={data.makerUser.id}
-              makerName={data.makerUser.name}
-              website={data.website}
-              approverId={data.checkerUser?.id}
-              approverName={data.checkerUser?.name}
+              bank={data}
               transactions={100}
               volume={100000}
               cardClass2="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-1 space-y-4"
@@ -146,6 +135,13 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
           setOpen={setOpenApprove}
           name={data.audits[0].name}
           website={data.audits[0].website}
+        />
+      )}
+      {openActivate && (
+        <BankActivate
+          bankId={data.id}
+          open={openActivate}
+          setOpen={setOpenActivate}
         />
       )}
     </main>

@@ -93,12 +93,13 @@ const tasks = [
 const BanksListPage: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false);
   const { data } = api.banks.getAll.useQuery();
+  console.log(data);
   if (!data) return null;
   return (
     <main>
       <BreadCrumbs pages={[{ name: "Banks", href: "/dashboard/banks" }]} />
       <div className="container mx-auto py-6">
-        <BanksTable data={tasks} onClick={setOpen} />
+        <BanksTable data={data} openSheet={() => setOpen(true)} />
         {open && <BankCreate open={open} setOpen={setOpen} />}
       </div>
     </main>

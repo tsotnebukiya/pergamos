@@ -81,11 +81,12 @@ Table Bank {
   checker String
   amending Boolean [not null, default: false]
   active Boolean [not null, default: false]
-  accounts BankAccount [not null]
   teams BankTeam [not null]
   makerUser User [not null]
   checkerUser User
   audits BankAudit [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
 }
 
 Table BankAudit {
@@ -104,20 +105,6 @@ Table BankAudit {
   checkerUser User
 }
 
-Table BankAccount {
-  id Int [pk, increment]
-  account String [not null]
-  market String [not null]
-  approved Boolean [not null, default: false]
-  bank Int [not null]
-  bankTeams BankTeam [not null]
-  bankId Bank [not null]
-
-  indexes {
-    (account, market) [unique]
-  }
-}
-
 Table BankTeam {
   id Int [pk, increment]
   maker String [not null]
@@ -127,7 +114,6 @@ Table BankTeam {
   assignedTeam Int [not null]
   citiTeam CitiTeam [not null]
   contactEmails ContactEmail [not null]
-  accounts BankAccount [not null]
   contactPhones ContactPhone [not null]
   bankId Bank [not null]
   makerUser User [not null]
@@ -146,15 +132,6 @@ Table ContactPhone {
   phone String [not null]
   bankTeam Int [not null]
   bankTeamId BankTeam [not null]
-}
-
-Table _BankAccountToBankTeam {
-  A Int [not null]
-  B Int [not null]
-
-  indexes {
-    (A, B) [unique]
-  }
 }
 
 Table _TeamMembers {
@@ -186,13 +163,11 @@ Ref: Bank.maker > User.id
 
 Ref: Bank.checker > User.id
 
-Ref: BankAudit.bank > Bank.id
+Ref: BankAudit.bank > Bank.id [delete: Cascade]
 
 Ref: BankAudit.maker > User.id
 
 Ref: BankAudit.checker > User.id
-
-Ref: BankAccount.bank > Bank.id
 
 Ref: BankTeam.assignedTeam > CitiTeam.id
 

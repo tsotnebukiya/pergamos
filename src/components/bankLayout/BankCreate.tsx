@@ -1,31 +1,25 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { z } from "zod";
 import { Button } from "../UI/Button";
-import { CardContent, CardFooter } from "../UI/Card";
 import { Input } from "../UI/Input";
-import { Label } from "../UI/Label";
-import { useForm, type SubmitHandler, Controller } from "react-hook-form";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../UI/Sheet";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { Sheet, SheetContent, SheetTitle } from "../UI/Sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert } from "../UI/Alert";
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { api } from "pergamos/utils/api";
 import { useToast } from "pergamos/hooks/useToast";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../UI/Form";
-
-const urlRegex =
-  /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
+import { regexUrl } from "pergamos/utils/utils";
 
 const formSchema = z.object({
-  website: z.string().regex(urlRegex, "Invalid URL"),
+  website: z.string().regex(regexUrl, "Invalid URL"),
   name: z.string().min(3, "Name must be at least 3 characters long"),
 });
 
@@ -35,6 +29,7 @@ const BankCreate: React.FC<{
 }> = ({ open, setOpen }) => {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const ctx = api.useContext();
   const { mutate } = api.banks.create.useMutation({
     onSuccess: () => {
       setSubmitting(false);
@@ -44,6 +39,7 @@ const BankCreate: React.FC<{
         title: "Success",
         description: "Bank created successfully",
       });
+      void ctx.banks.getAll.invalidate();
     },
     onError: (error) => {
       setSubmitting(false);
@@ -110,6 +106,7 @@ const BankCreate: React.FC<{
                 type="button"
                 variant="outline"
                 onMouseDown={() => setOpen(false)}
+                disabled={submitting}
               >
                 Close
               </Button>

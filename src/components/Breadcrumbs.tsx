@@ -6,7 +6,10 @@ const BreadCrumbs: React.FC<{ pages: { name: string; href: string }[] }> = ({
   pages,
 }) => {
   return (
-    <nav className="flex border-b" aria-label="Breadcrumb">
+    <nav
+      className="sticky top-16 z-50 flex border-b bg-background"
+      aria-label="Breadcrumb"
+    >
       <ol
         role="list"
         className=" mx-auto flex w-full space-x-4 px-4 sm:px-6 lg:px-8"

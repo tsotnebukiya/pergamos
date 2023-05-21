@@ -90,11 +90,13 @@ model Bank {
   checker     String?
   amending    Boolean       @default(false)
   active      Boolean       @default(false)
-  accounts    BankAccount[] @relation("BankAccounts")
   teams       BankTeam[]    @relation("BankTeams")
   makerUser   User          @relation("BankMaker", fields: [maker], references: [id])
   checkerUser User?         @relation("BankChecker", fields: [checker], references: [id])
   audits      BankAudit[]   @relation("BankAudits")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
 
   @@index([maker])
   @@index([checker])
@@ -112,7 +114,7 @@ model BankAudit {
   status    Status     @default(PENDING)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  bankId    Bank     @relation("BankAudits",fields: [bank], references: [id])
+  bankId    Bank     @relation("BankAudits",fields: [bank], references: [id], onDelete: Cascade)
   makerUser User       @relation("AuditMaker", fields: [maker], references: [id])
   checkerUser User?    @relation("AuditChecker", fields: [checker], references: [id])
 
@@ -121,18 +123,7 @@ model BankAudit {
   @@index([checker])
 }
 
-model BankAccount {
-  id        Int        @id @default(autoincrement())
-  account   String
-  market    String
-  approved  Boolean    @default(false)
-  bank      Int
-  bankTeams BankTeam[]
-  bankId    Bank       @relation("BankAccounts", fields: [bank], references: [id])
 
-  @@unique([account, market])
-  @@index([bank])
-}
 
 model BankTeam {
   id            Int            @id @default(autoincrement())
@@ -140,10 +131,11 @@ model BankTeam {
   checker       String?
   approved      Boolean        @default(false)
   bank          Int
+  market        String
+  accounts      Int
   assignedTeam  Int
   citiTeam      CitiTeam       @relation("BankTeamsToCitiTeam", fields: [assignedTeam], references: [id])
   contactEmails ContactEmail[]
-  accounts      BankAccount[]
   contactPhones ContactPhone[]
   bankId        Bank           @relation("BankTeams", fields: [bank], references: [id])
   makerUser     User           @relation("TeamMaker", fields: [maker], references: [id])
@@ -173,14 +165,7 @@ model ContactPhone {
   @@index([bankTeam])
 }
 
-model BankAccountToBankTeam {
-  A Int
-  B Int
 
-  @@unique([A, B], map: "_BankAccountToBankTeam_AB_unique")
-  @@index([B], map: "_BankAccountToBankTeam_B_index")
-  @@map("_BankAccountToBankTeam")
-}
 
 model TeamMembers {
   A Int

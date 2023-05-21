@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { z } from "zod";
 import { Button } from "../UI/Button";
-import { CardContent, CardFooter } from "../UI/Card";
 import { Input } from "../UI/Input";
-import { Label } from "../UI/Label";
-import { useForm, type SubmitHandler, Controller } from "react-hook-form";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../UI/Sheet";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { Sheet, SheetContent, SheetTitle } from "../UI/Sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert } from "../UI/Alert";
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { api } from "pergamos/utils/api";
 import { useToast } from "pergamos/hooks/useToast";
 import {
@@ -20,13 +17,11 @@ import {
   FormMessage,
 } from "../UI/Form";
 import { useRouter } from "next/router";
-
-const urlRegex =
-  /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
+import { regexUrl } from "pergamos/utils/utils";
 
 const formSchema = z
   .object({
-    website: z.string().regex(urlRegex, "Invalid URL").or(z.literal("")),
+    website: z.string().regex(regexUrl, "Invalid URL").or(z.literal("")),
     name: z
       .string()
       .min(3, "Name must be at least 3 characters long")
@@ -80,7 +75,6 @@ const BankAmend: React.FC<{
     setSubmitting(true);
     mutate({ bankId: Number(bankId), details: data });
   };
-  const generalError = form.formState.errors["_error"]?.message;
   return (
     <Sheet
       onOpenChange={(val) => {
@@ -89,7 +83,7 @@ const BankAmend: React.FC<{
       open={open}
     >
       <SheetContent size={"sm"} onInteractOutside={() => setOpen(false)}>
-        <SheetTitle className="py-6">Add bank</SheetTitle>
+        <SheetTitle className="py-6">Edit bank</SheetTitle>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
@@ -123,6 +117,7 @@ const BankAmend: React.FC<{
                 type="button"
                 variant="outline"
                 onMouseDown={() => setOpen(false)}
+                disabled={submitting}
               >
                 Close
               </Button>

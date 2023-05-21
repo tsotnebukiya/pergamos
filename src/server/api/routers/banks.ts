@@ -2,11 +2,10 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "pergamos/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { regexUrl } from "pergamos/utils/utils";
 
 // const MAX_SIZE = 500000; // 500kb
 // const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/jpg"];
-export const urlRegex =
-  /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
 export const banksRouter = createTRPCRouter({
   getOne: protectedProcedure
     .input(z.object({ id: z.number() }))
@@ -15,6 +14,7 @@ export const banksRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
+
         select: {
           id: true,
           name: true,
@@ -22,6 +22,7 @@ export const banksRouter = createTRPCRouter({
           image: true,
           active: true,
           amending: true,
+
           audits: {
             orderBy: {
               createdAt: "desc",
@@ -43,16 +44,15 @@ export const banksRouter = createTRPCRouter({
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const bank = await ctx.prisma.bank.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       select: {
         id: true,
         name: true,
         active: true,
         amending: true,
-        teams: {
-          select: {
-            _count: true,
-          },
-        },
+        website: true,
         _count: {
           select: { teams: true },
         },
@@ -69,8 +69,8 @@ export const banksRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        website: z.string().regex(urlRegex, "Invalid URL"),
-        name: z.string().min(5, "Name must be at least 5 characters long"),
+        website: z.string().regex(regexUrl, "Invalid URL"),
+        name: z.string().min(3, "Name must be at least 5 characters long"),
       })
     )
     .mutation(async ({ ctx, input }) => {

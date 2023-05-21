@@ -27,7 +27,7 @@ import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar, type FilterOption } from "./DataTableToolbar";
 import { useRouter } from "next/router";
 
-interface DataTableProps<TData extends { id: string }, TValue> {
+interface DataTableProps<TData extends { id: string | number }, TValue> {
   columns: ColumnDef<TData, any>[];
   data: TData[];
   link?: string;
@@ -37,7 +37,7 @@ interface DataTableProps<TData extends { id: string }, TValue> {
   actions?: React.ReactNode;
 }
 
-export function DataTable<TData extends { id: string }, TValue>({
+export function DataTable<TData extends { id: string | number }, TValue>({
   columns,
   data,
   pageSize,

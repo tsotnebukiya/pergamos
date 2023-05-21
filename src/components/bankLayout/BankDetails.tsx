@@ -1,32 +1,19 @@
-import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
+import { DollarSign, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card";
 import { Badge } from "../UI/Badge";
 import { Button } from "../UI/Button";
 import Link from "next/link";
+import { type RouterOutputs } from "pergamos/utils/api";
+
+type Bank = RouterOutputs["banks"]["getOne"];
 
 const BankDetails: React.FC<{
   cardClass1?: string;
   cardClass2?: string;
-  active: boolean;
-  makerName: string;
-  makerId: string;
-  approverName?: string;
-  approverId?: string;
+  bank: Bank;
   transactions?: number;
-  website: string;
   volume?: number;
-}> = ({
-  cardClass1,
-  cardClass2,
-  active,
-  makerId,
-  makerName,
-  website,
-  approverId,
-  approverName,
-  transactions,
-  volume,
-}) => {
+}> = ({ cardClass1, cardClass2, bank, transactions, volume }) => {
   return (
     <>
       <Card className={cardClass1}>
@@ -34,31 +21,44 @@ const BankDetails: React.FC<{
           <CardTitle>Bank Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             <div className="flex justify-between">
               <span>Status</span>
-              <Badge variant={active ? "outline" : "secondary"}>
-                {active ? "Active" : "Inactive"}
+              <Badge variant={bank.active ? "outline" : "secondary"}>
+                {bank.active ? "Active" : "Inactive"}
               </Badge>
             </div>
             <div className="flex justify-between">
               <span>Website</span>
-              <a href={website} className="hover:underline" target="_blank">
-                {website}
+              <a
+                href={bank.website}
+                className="hover:underline"
+                target="_blank"
+              >
+                <Button variant="link" className="h-0 items-start py-0">
+                  {bank.website}
+                </Button>
               </a>
             </div>
             <div className="flex justify-between">
               <span>Created By</span>
-              <Link href={`dashboard/users/${makerId}`}>
-                <Button variant="link">{makerName}</Button>
+              <Link
+                href={`dashboard/users/${bank.makerUser.id}`}
+                className="items-start"
+              >
+                <Button variant="link" className="h-0 items-start py-0">
+                  {bank.makerUser.name}
+                </Button>
               </Link>
             </div>
-            {approverId && approverName && (
+            {bank.checkerUser?.id && bank.checkerUser.name && (
               <div className="flex justify-between">
                 <span>Approved By</span>
 
-                <Link href={`dashboard/users/${approverId}`}>
-                  <Button variant="link">{approverName}</Button>
+                <Link href={`dashboard/users/${bank.checkerUser.id}`}>
+                  <Button variant="link" className="h-10 items-start py-0">
+                    {bank.checkerUser.name}
+                  </Button>
                 </Link>
               </div>
             )}

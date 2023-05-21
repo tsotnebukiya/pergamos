@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,30 +11,46 @@ import { Button } from "../UI/Button";
 import { Label } from "../UI/Label";
 import { Input } from "../UI/Input";
 import { api } from "pergamos/utils/api";
+import { useToast } from "pergamos/hooks/useToast";
 
 const BankApprove: React.FC<{
   open: boolean;
   amendId: number;
   bankId: number;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  name?: string | null;
-  website?: string | null;
+  name: string | null;
+  website: string | null;
 }> = ({ open, setOpen, name, website, bankId, amendId }) => {
+  const { toast } = useToast();
+  const ctx = api.useContext();
   const [submitting, setSubmitting] = useState(false);
   const { mutate } = api.banks.amendChecker.useMutation({
     onSuccess: () => {
       setSubmitting(false);
       setOpen(false);
+      toast({
+        variant: "default",
+        title: "Success",
+        description: "Bank amended successfully",
+      });
+      void ctx.banks.getOne.invalidate({ id: bankId });
     },
     onError: (error) => {
       setSubmitting(false);
       setOpen(false);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
     },
   });
   const onApprove = () => {
+    setSubmitting(true);
     mutate({ action: "APPROVE", bankId: bankId, amendId: amendId });
   };
   const onReject = () => {
+    setSubmitting(true);
     mutate({ action: "REJECT", bankId: bankId, amendId: amendId });
   };
   return (
@@ -82,14 +98,21 @@ const BankApprove: React.FC<{
               variant="outline"
               onClick={() => setOpen(false)}
               className="self-start"
+              disabled={submitting}
             >
               Close
             </Button>
             <div className="flex gap-4">
-              <Button variant="destructive" onClick={onReject}>
+              <Button
+                variant="destructive"
+                onClick={onReject}
+                disabled={submitting}
+              >
                 Reject
               </Button>
-              <Button onClick={onApprove}>Submit</Button>
+              <Button onClick={onApprove} disabled={submitting}>
+                Approve
+              </Button>
             </div>
           </div>
         </DialogFooter>

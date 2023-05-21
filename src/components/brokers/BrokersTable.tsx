@@ -1,12 +1,5 @@
-import { type FilterFn, createColumnHelper } from "@tanstack/react-table";
-import {
-  RankingInfo,
-  rankItem,
-  compareItems,
-} from "@tanstack/match-sorter-utils";
-import { CustomFilterFns } from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../table/DataTableColumnHeader";
-import { z } from "zod";
 import { DataTable } from "../table/DataTable";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card";
 import { Button } from "../UI/Button";
@@ -14,7 +7,7 @@ import Link from "next/link";
 
 type Broker = {
   id: string;
-  title: string;
+  name: string;
   market: string;
   accounts: string[];
   assignedTeam: {
@@ -26,7 +19,7 @@ type Broker = {
 const columnHelper = createColumnHelper<Broker>();
 
 const columns = [
-  columnHelper.accessor("title", {
+  columnHelper.accessor("name", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -50,7 +43,7 @@ const columns = [
       return (
         <div className="flex space-x-2">
           <div className="flex  items-center">
-            <span>
+            <span className="max-w-[300px]">
               {props
                 .getValue()
                 .map((acc, index) => `${index > 0 ? " | " : ""}${acc}`)}
@@ -77,7 +70,7 @@ const columns = [
       return (
         <div className="flex space-x-2">
           <span
-            className={`fi fi-${
+            className={`fi max-w-[300px] fi-${
               value === "icsd" ? "un" : value === "uk" ? "gb" : value
             }`}
           />
@@ -104,7 +97,7 @@ const columns = [
         <div className="flex space-x-2">
           <Link href={`/dashboard/teams/${props.getValue().id}`}>
             <Button variant="link">
-              <span className="truncate font-medium">
+              <span className="max-w-[300px] truncate font-medium">
                 {props.getValue().name}
               </span>
             </Button>
@@ -144,16 +137,16 @@ const BrokersTable: React.FC<{
   );
   return (
     <Card className={cardClass}>
-      <CardHeader>
+      <CardHeader className="px-0">
         <CardTitle>Brokers</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0">
         <DataTable
           columns={columns}
           data={data}
           selecting={false}
           pageSize={5}
-          link={`/dashboard/${bankId}/brokers`}
+          link={`/dashboard/banks/${bankId}/brokers`}
           filters={[
             {
               columnName: "accounts",

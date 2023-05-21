@@ -14,36 +14,49 @@ import { useToast } from "pergamos/hooks/useToast";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../UI/Form";
+import { useRouter } from "next/router";
 
 const urlRegex =
   /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
 
-const formSchema = z.object({
-  website: z.string().regex(urlRegex, "Invalid URL"),
-  name: z.string().min(3, "Name must be at least 3 characters long"),
-});
+const formSchema = z
+  .object({
+    website: z.string().regex(urlRegex, "Invalid URL").or(z.literal("")),
+    name: z
+      .string()
+      .min(3, "Name must be at least 3 characters long")
+      .or(z.literal("")),
+    _error: z.string().optional(),
+  })
+  .refine((value) => value.website !== "" || value.name !== "", {
+    message: "At least one field must not be an empty string",
+    path: ["_error"],
+  });
 
-const BankCreate: React.FC<{
+const BankAmend: React.FC<{
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }> = ({ open, setOpen }) => {
+  const { bankId } = useRouter().query;
   const { toast } = useToast();
+  const ctx = api.useContext();
   const [submitting, setSubmitting] = useState(false);
-  const { mutate } = api.banks.create.useMutation({
+
+  const { mutate } = api.banks.amend.useMutation({
     onSuccess: () => {
       setSubmitting(false);
       setOpen(false);
       toast({
         variant: "default",
         title: "Success",
-        description: "Bank created successfully",
+        description: "Bank amended successfully",
       });
+      void ctx.banks.getOne.invalidate({ id: Number(bankId) });
     },
     onError: (error) => {
       setSubmitting(false);
@@ -63,11 +76,11 @@ const BankCreate: React.FC<{
       website: "",
     },
   });
-
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
     setSubmitting(true);
-    mutate(data);
+    mutate({ bankId: Number(bankId), details: data });
   };
+  const generalError = form.formState.errors["_error"]?.message;
   return (
     <Sheet
       onOpenChange={(val) => {
@@ -86,7 +99,7 @@ const BankCreate: React.FC<{
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Name" {...field} />
+                    <Input placeholder="Name" {...field} required={false} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,4 +137,4 @@ const BankCreate: React.FC<{
   );
 };
 
-export default BankCreate;
+export default BankAmend;

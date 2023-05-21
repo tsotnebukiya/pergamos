@@ -15,8 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from "pergamos/components/UI/Card";
-import BrokersTable from "pergamos/components/bankLayout/BrokersTable";
+import BrokersTable from "pergamos/components/brokers/BrokersTable";
 import BankDetails from "pergamos/components/bankLayout/BankDetails";
+import EmptyState from "pergamos/components/UI/EmptyState";
+import BankCreate from "pergamos/components/bankLayout/BankCreate";
+import BrokerCreate from "pergamos/components/brokers/BrokerCreate";
+import BankAmend from "pergamos/components/bankLayout/BankAmend";
+import BankApprove from "pergamos/components/bankLayout/BankApprove";
 
 const brokers = [
   {
@@ -62,56 +67,11 @@ const brokers = [
 ];
 
 const BrokerOverviewPage: NextPageWithLayout = () => {
-  const session = useSession();
-  console.log(session.data?.user.id);
-  const query = useRouter().query.bankId as string;
-  const [openActivate, setOpenActivate] = useState(false);
+  const [openBrokerCreate, setOpenBrokerCreate] = useState(false);
+  const [openBankdAmend, setOpenBankAmend] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);
+  const query = useRouter().query.bankId as string;
   const { data } = api.banks.getOne.useQuery({ id: Number(query) });
-  const ctx = api.useContext();
-  const { mutate: mutateBank } = api.banks.activate.useMutation({
-    onSuccess: () => {
-      void ctx.banks.getOne.invalidate({ id: Number(query) });
-      // toast.custom((t) => <Notify t={t} type="success" />);
-    },
-    onError: (err) => {
-      // toast.custom((t) => <Notify t={t} type="error" text={err.message} />);
-    },
-  });
-  const { mutate: mutateCheck } = api.banks.amendChecker.useMutation({
-    onSettled: () => {
-      setOpenApprove(false);
-    },
-    onSuccess: () => {
-      void ctx.banks.getOne.invalidate({ id: Number(query) });
-      // toast.custom((t) => <Notify t={t} type="success" />);
-    },
-    onError: (err) => {
-      // toast.custom((t) => <Notify t={t} type="error" text={err.message} />);
-    },
-  });
-  const activateHandler = () => {
-    mutateBank({ id: Number(query) });
-    setOpenActivate(false);
-  };
-  const approveHandler = () => {
-    if (data?.audits[0]?.id) {
-      mutateCheck({
-        action: "APPROVE",
-        amendId: data?.audits[0]?.id,
-        bankId: Number(query),
-      });
-    }
-  };
-  const rejectHandler = () => {
-    if (data?.audits[0]?.id) {
-      mutateCheck({
-        action: "REJECT",
-        amendId: data?.audits[0]?.id,
-        bankId: Number(query),
-      });
-    }
-  };
   if (!data) return null;
   return (
     <main>
@@ -122,30 +82,72 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
           {!data.active ? (
             <Button size="sm">Approve</Button>
           ) : data.amending ? (
-            <Button size="sm" variant="outline">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setOpenApprove(true)}
+            >
               Pending Changes
             </Button>
           ) : (
-            <Button size="sm">Edit</Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setOpenBankAmend(true);
+              }}
+            >
+              Edit
+            </Button>
           )}
         </div>
         <div className="space-y-4">
-          <div className="grid grid-cols-2  gap-4 lg:grid-cols-4">
-            <BankStats />
-          </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
             <BankDetails
-              cardClass1="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-1"
-              cardClass2="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-2"
+              active={data.active}
+              makerId={data.makerUser.id}
+              makerName={data.makerUser.name}
+              website={data.website}
+              approverId={data.checkerUser?.id}
+              approverName={data.checkerUser?.name}
+              transactions={100}
+              volume={100000}
+              cardClass2="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-1 space-y-4"
+              cardClass1="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-2 "
             />
+            {/* <EmptyState
+              text="broker"
+              cardClass="h-full flex align-center justify-center col-span-1 md:col-span-2 lg:col-start-1 lg:col-span-5 lg:row-span-2 border-none shadow-none"
+              action={() => {
+                setOpenBrokerCreate(true);
+              }}
+            /> */}
             <BrokersTable
               bankId={query}
               data={brokers}
+              openSheet={() => {
+                setOpenBrokerCreate(true);
+              }}
               cardClass="col-span-1 md:col-span-2 lg:col-start-1 lg:col-span-5 lg:row-span-2 border-none shadow-none"
             />
           </div>
         </div>
       </div>
+      {openBankdAmend && (
+        <BankAmend open={openBankdAmend} setOpen={setOpenBankAmend} />
+      )}
+      {openBrokerCreate && (
+        <BrokerCreate open={openBrokerCreate} setOpen={setOpenBrokerCreate} />
+      )}
+      {data.audits[0] && (
+        <BankApprove
+          bankId={data.id}
+          amendId={data.audits[0].id}
+          open={openApprove}
+          setOpen={setOpenApprove}
+          name={data.audits[0].name}
+          website={data.audits[0].website}
+        />
+      )}
     </main>
   );
 };

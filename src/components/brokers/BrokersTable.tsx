@@ -121,7 +121,8 @@ const BrokersTable: React.FC<{
   data: Broker[];
   cardClass?: string;
   bankId: string;
-}> = ({ data, cardClass, bankId }) => {
+  openSheet: () => void;
+}> = ({ data, cardClass, bankId, openSheet }) => {
   const accounts = Array.from(
     new Set(data.flatMap((broker) => broker.accounts))
   ).map((value) => ({ value: value }));
@@ -165,7 +166,11 @@ const BrokersTable: React.FC<{
               options: [...markets],
             },
           ]}
-          actions={<Button className="h-8">Add New</Button>}
+          actions={
+            <Button className="h-8" onClick={openSheet}>
+              Add New
+            </Button>
+          }
         />
       </CardContent>
     </Card>

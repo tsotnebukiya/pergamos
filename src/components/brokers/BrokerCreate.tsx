@@ -21,15 +21,22 @@ import {
   FormMessage,
 } from "../UI/Form";
 
-const urlRegex =
+export const urlRegex =
   /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/g;
+
+const schema = z.object({
+  website: z.string().regex(urlRegex, "Invalid URL"),
+  name: z.string().min(5, "Name must be at least 3 characters long"),
+});
+
+export type BankForm = z.infer<typeof schema>;
 
 const formSchema = z.object({
   website: z.string().regex(urlRegex, "Invalid URL"),
-  name: z.string().min(3, "Name must be at least 3 characters long"),
+  name: z.string().min(5, "Name must be at least 3 characters long"),
 });
 
-const BankCreate: React.FC<{
+const BrokerCreate: React.FC<{
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }> = ({ open, setOpen }) => {
@@ -58,13 +65,9 @@ const BankCreate: React.FC<{
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
-    defaultValues: {
-      name: "",
-      website: "",
-    },
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
+  const onSubmit: SubmitHandler<BankForm> = (data) => {
     setSubmitting(true);
     mutate(data);
   };
@@ -124,4 +127,4 @@ const BankCreate: React.FC<{
   );
 };
 
-export default BankCreate;
+export default BrokerCreate;

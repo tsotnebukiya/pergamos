@@ -28,7 +28,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+      <div className="flex flex-col justify-start gap-2 big:flex-row big:items-center">
         <Input
           placeholder="Filter tasks..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
@@ -37,30 +37,32 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {filters.map((filter) => {
-          const column = table.getColumn(filter.columnName);
-          if (column) {
-            return (
-              <DataTableFacetedFilter
-                key={filter.columnName}
-                column={column}
-                title={filter.title}
-                options={filter.options}
-              />
-            );
-          }
-          return null;
-        })}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
-          >
-            Reset
-            <X className="ml-2 h-4 w-4" />
-          </Button>
-        )}
+        <div className="flex justify-between gap-2">
+          {filters.map((filter) => {
+            const column = table.getColumn(filter.columnName);
+            if (column) {
+              return (
+                <DataTableFacetedFilter
+                  key={filter.columnName}
+                  column={column}
+                  title={filter.title}
+                  options={filter.options}
+                />
+              );
+            }
+            return null;
+          })}
+          {isFiltered && (
+            <Button
+              variant="ghost"
+              onClick={() => table.resetColumnFilters()}
+              className="h-8 px-2 lg:px-3"
+            >
+              Reset
+              <X className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
       <div className="flex space-x-2">
         <DataTableViewOptions table={table} />

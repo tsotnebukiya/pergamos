@@ -7,12 +7,12 @@ import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
 import { Button } from "pergamos/components/UI/Button";
-import BrokersTable from "pergamos/components/brokers/BrokersTable";
-import BankDetails from "pergamos/components/bankLayout/BankDetails";
-import BrokerCreate from "pergamos/components/brokers/BrokerCreate";
-import BankAmend from "pergamos/components/bankLayout/BankAmend";
-import BankApprove from "pergamos/components/bankLayout/BankAmendApprove";
-import BankActivate from "pergamos/components/bankLayout/BankActivate";
+import BrokersTable from "pergamos/components/brokerComponents/BrokersTable";
+import BankDetails from "pergamos/components/bankComponents/BankDetails";
+import BrokerCreate from "pergamos/components/brokerComponents/BrokerCreate";
+import BankAmend from "pergamos/components/bankComponents/BankAmend";
+import BankApprove from "pergamos/components/bankComponents/BankAmendApprove";
+import BankActivate from "pergamos/components/bankComponents/BankActivate";
 
 const brokers = [
   {

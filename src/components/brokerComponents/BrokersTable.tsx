@@ -4,6 +4,7 @@ import { DataTable } from "../table/DataTable";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card";
 import { Button } from "../UI/Button";
 import Link from "next/link";
+import { Market } from "../UI/Market";
 
 type Broker = {
   id: string;
@@ -69,12 +70,7 @@ const columns = [
       const value = props.getValue();
       return (
         <div className="flex space-x-2">
-          <span
-            className={`fi max-w-[300px] fi-${
-              value === "icsd" ? "un" : value === "uk" ? "gb" : value
-            }`}
-          />
-          <span className="truncate font-medium">{value.toUpperCase()}</span>
+          <Market market={value} />
         </div>
       );
     },

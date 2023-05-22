@@ -5,8 +5,8 @@ import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import { api } from "pergamos/utils/api";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
-import BanksTable from "pergamos/components/bankLayout/BanksTable";
-import BankCreate from "pergamos/components/bankLayout/BankCreate";
+import BanksTable from "pergamos/components/bankComponents/BanksTable";
+import BankCreate from "pergamos/components/bankComponents/BankCreate";
 import { useToast } from "pergamos/hooks/useToast";
 
 const tasks = [

@@ -107,17 +107,27 @@ Table BankAudit {
 
 Table BankTeam {
   id Int [pk, increment]
+  name String [unique, not null]
   maker String [not null]
   checker String
   approved Boolean [not null, default: false]
   bank Int [not null]
+  market String [not null]
   assignedTeam Int [not null]
   citiTeam CitiTeam [not null]
   contactEmails ContactEmail [not null]
   contactPhones ContactPhone [not null]
+  accounts BankAccounts [not null]
   bankId Bank [not null]
   makerUser User [not null]
   checkerUser User
+}
+
+Table BankAccounts {
+  id String [pk]
+  account String [not null]
+  bankTeam Int [not null]
+  bankTeamId BankTeam [not null]
 }
 
 Table ContactEmail {
@@ -176,6 +186,8 @@ Ref: BankTeam.bank > Bank.id
 Ref: BankTeam.maker > User.id
 
 Ref: BankTeam.checker > User.id
+
+Ref: BankAccounts.bankTeam > BankTeam.id
 
 Ref: ContactEmail.bankTeam > BankTeam.id
 

@@ -4,8 +4,6 @@ import { createTRPCRouter, protectedProcedure } from "pergamos/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { regexUrl } from "pergamos/utils/utils";
 
-// const MAX_SIZE = 500000; // 500kb
-// const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 export const banksRouter = createTRPCRouter({
   getOne: protectedProcedure
     .input(z.object({ id: z.number() }))
@@ -70,7 +68,7 @@ export const banksRouter = createTRPCRouter({
     .input(
       z.object({
         website: z.string().regex(regexUrl, "Invalid URL"),
-        name: z.string().min(3, "Name must be at least 5 characters long"),
+        name: z.string().min(3, "Name must be at least 3 characters long"),
       })
     )
     .mutation(async ({ ctx, input }) => {

@@ -3,7 +3,7 @@ import type { NextPageWithLayout } from "pergamos/utils/types";
 import DashboardLayout from "pergamos/components/layouts/DashboardLayout";
 
 const DashboardPage: NextPageWithLayout = () => {
-  return <>asdawd</>;
+  return <></>;
 };
 
 DashboardPage.getLayout = function getLayout(page: ReactElement) {

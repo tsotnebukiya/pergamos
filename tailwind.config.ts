@@ -13,7 +13,8 @@ export default {
 
     extend: {
       screens: {
-        big: "1350px",
+        1250: "1250px",
+        toolbarLG: "1590px",
       },
       colors: {
         border: "hsl(var(--border))",

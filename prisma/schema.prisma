@@ -127,16 +127,17 @@ model BankAudit {
 
 model BankTeam {
   id            Int            @id @default(autoincrement())
+  name          String         @unique
   maker         String
   checker       String?
   approved      Boolean        @default(false)
   bank          Int
   market        String
-  accounts      Int
   assignedTeam  Int
   citiTeam      CitiTeam       @relation("BankTeamsToCitiTeam", fields: [assignedTeam], references: [id])
   contactEmails ContactEmail[]
   contactPhones ContactPhone[]
+  accounts      BankAccounts[]
   bankId        Bank           @relation("BankTeams", fields: [bank], references: [id])
   makerUser     User           @relation("TeamMaker", fields: [maker], references: [id])
   checkerUser   User?          @relation("TeamChecker", fields: [checker], references: [id])
@@ -145,6 +146,15 @@ model BankTeam {
   @@index([maker])
   @@index([checker])
   @@index([assignedTeam])
+}
+
+model BankAccounts {
+    id            String     @id @default(cuid())
+    account       String
+    bankTeam      Int 
+    bankTeamId    BankTeam   @relation(fields: [bankTeam], references: [id])
+
+    @@index([bankTeam])
 }
 
 model ContactEmail {

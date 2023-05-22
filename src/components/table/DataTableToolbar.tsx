@@ -27,8 +27,8 @@ export function DataTableToolbar<TData>({
     table.getFilteredRowModel().rows.length;
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-col justify-start gap-2 big:flex-row big:items-center">
+    <div className="items-top flex justify-between">
+      <div className="flex flex-col justify-start gap-2 toolbarLG:flex-row toolbarLG:items-center">
         <Input
           placeholder="Filter tasks..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -64,9 +64,9 @@ export function DataTableToolbar<TData>({
           )}
         </div>
       </div>
-      <div className="flex space-x-2">
-        <DataTableViewOptions table={table} />
+      <div className="flex flex-col gap-2 space-x-2 1250:flex-row">
         {actions}
+        <DataTableViewOptions table={table} />
       </div>
     </div>
   );

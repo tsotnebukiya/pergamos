@@ -68,8 +68,8 @@ model User {
   sessions      Session[]
   createdBanks  Bank[]     @relation("BankMaker")
   checkedBanks  Bank[]     @relation("BankChecker")
-  createdTeams  BankTeam[] @relation("TeamMaker")
-  checkedTeams  BankTeam[] @relation("TeamChecker")
+  createdTeams  Broker[] @relation("TeamMaker")
+  checkedTeams  Broker[] @relation("TeamChecker")
   createdAudits BankAudit[]@relation("AuditMaker")
   checkedAudits BankAudit[]@relation("AuditChecker")
 }
@@ -78,7 +78,7 @@ model CitiTeam {
   id        Int        @id @default(autoincrement())
   name      String
   members   User[]     @relation("TeamMembers")
-  bankTeams BankTeam[] @relation("BankTeamsToCitiTeam")
+  Brokers Broker[] @relation("BrokersToCitiTeam")
 }
 
 model Bank {
@@ -90,7 +90,7 @@ model Bank {
   checker     String?
   amending    Boolean       @default(false)
   active      Boolean       @default(false)
-  teams       BankTeam[]    @relation("BankTeams")
+  brokers       Broker[]    @relation("Brokers")
   makerUser   User          @relation("BankMaker", fields: [maker], references: [id])
   checkerUser User?         @relation("BankChecker", fields: [checker], references: [id])
   audits      BankAudit[]   @relation("BankAudits")
@@ -125,20 +125,20 @@ model BankAudit {
 
 
 
-model BankTeam {
+model Broker {
   id            Int            @id @default(autoincrement())
   name          String         @unique
   maker         String
   checker       String?
-  approved      Boolean        @default(false)
+  active      Boolean        @default(false)
   bank          Int
   market        String
   assignedTeam  Int
-  citiTeam      CitiTeam       @relation("BankTeamsToCitiTeam", fields: [assignedTeam], references: [id])
+  citiTeam      CitiTeam       @relation("BrokersToCitiTeam", fields: [assignedTeam], references: [id])
   contactEmails ContactEmail[]
   contactPhones ContactPhone[]
   accounts      BankAccounts[]
-  bankId        Bank           @relation("BankTeams", fields: [bank], references: [id])
+  bankId        Bank           @relation("Brokers", fields: [bank], references: [id])
   makerUser     User           @relation("TeamMaker", fields: [maker], references: [id])
   checkerUser   User?          @relation("TeamChecker", fields: [checker], references: [id])
 
@@ -151,40 +151,32 @@ model BankTeam {
 model BankAccounts {
     id            String     @id @default(cuid())
     account       String
-    bankTeam      Int 
-    bankTeamId    BankTeam   @relation(fields: [bankTeam], references: [id])
+    Broker      Int 
+    BrokerId    Broker   @relation(fields: [Broker], references: [id])
 
-    @@index([bankTeam])
+    @@index([Broker])
 }
 
 model ContactEmail {
   id         String   @id @default(cuid())
   email      String
-  bankTeam   Int
-  bankTeamId BankTeam @relation(fields: [bankTeam], references: [id])
+  Broker   Int
+  BrokerId Broker @relation(fields: [Broker], references: [id])
 
-  @@index([bankTeam])
+  @@index([Broker])
 }
 
 model ContactPhone {
   id         String   @id @default(cuid())
   phone      String
-  bankTeam   Int
-  bankTeamId BankTeam @relation(fields: [bankTeam], references: [id])
+  Broker   Int
+  BrokerId Broker @relation(fields: [Broker], references: [id])
 
-  @@index([bankTeam])
+  @@index([Broker])
 }
 
 
 
-model TeamMembers {
-  A Int
-  B String
-
-  @@unique([A, B], map: "_TeamMembers_AB_unique")
-  @@index([B], map: "_TeamMembers_B_index")
-  @@map("_TeamMembers")
-}
 
 enum Role {
   USER

@@ -82,7 +82,11 @@ const BankCreate: React.FC<{
                 <FormItem>
                   <FormLabel>Bank Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Name" {...field} />
+                    <Input
+                      placeholder="Name"
+                      {...field}
+                      className="max-w-[300px]"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -95,7 +99,11 @@ const BankCreate: React.FC<{
                 <FormItem>
                   <FormLabel>Website</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://website.com" {...field} />
+                    <Input
+                      placeholder="https://website.com"
+                      {...field}
+                      className="max-w-[300px]"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -59,8 +59,8 @@ Table User {
   sessions Session [not null]
   createdBanks Bank [not null]
   checkedBanks Bank [not null]
-  createdTeams BankTeam [not null]
-  checkedTeams BankTeam [not null]
+  createdTeams Broker [not null]
+  checkedTeams Broker [not null]
   createdAudits BankAudit [not null]
   checkedAudits BankAudit [not null]
 }
@@ -69,7 +69,7 @@ Table CitiTeam {
   id Int [pk, increment]
   name String [not null]
   members User [not null]
-  bankTeams BankTeam [not null]
+  Brokers Broker [not null]
 }
 
 Table Bank {
@@ -81,7 +81,7 @@ Table Bank {
   checker String
   amending Boolean [not null, default: false]
   active Boolean [not null, default: false]
-  teams BankTeam [not null]
+  brokers Broker [not null]
   makerUser User [not null]
   checkerUser User
   audits BankAudit [not null]
@@ -105,12 +105,12 @@ Table BankAudit {
   checkerUser User
 }
 
-Table BankTeam {
+Table Broker {
   id Int [pk, increment]
   name String [unique, not null]
   maker String [not null]
   checker String
-  approved Boolean [not null, default: false]
+  active Boolean [not null, default: false]
   bank Int [not null]
   market String [not null]
   assignedTeam Int [not null]
@@ -126,31 +126,22 @@ Table BankTeam {
 Table BankAccounts {
   id String [pk]
   account String [not null]
-  bankTeam Int [not null]
-  bankTeamId BankTeam [not null]
+  Broker Int [not null]
+  BrokerId Broker [not null]
 }
 
 Table ContactEmail {
   id String [pk]
   email String [not null]
-  bankTeam Int [not null]
-  bankTeamId BankTeam [not null]
+  Broker Int [not null]
+  BrokerId Broker [not null]
 }
 
 Table ContactPhone {
   id String [pk]
   phone String [not null]
-  bankTeam Int [not null]
-  bankTeamId BankTeam [not null]
-}
-
-Table _TeamMembers {
-  A Int [not null]
-  B String [not null]
-
-  indexes {
-    (A, B) [unique]
-  }
+  Broker Int [not null]
+  BrokerId Broker [not null]
 }
 
 Enum Role {
@@ -179,16 +170,16 @@ Ref: BankAudit.maker > User.id
 
 Ref: BankAudit.checker > User.id
 
-Ref: BankTeam.assignedTeam > CitiTeam.id
+Ref: Broker.assignedTeam > CitiTeam.id
 
-Ref: BankTeam.bank > Bank.id
+Ref: Broker.bank > Bank.id
 
-Ref: BankTeam.maker > User.id
+Ref: Broker.maker > User.id
 
-Ref: BankTeam.checker > User.id
+Ref: Broker.checker > User.id
 
-Ref: BankAccounts.bankTeam > BankTeam.id
+Ref: BankAccounts.Broker > Broker.id
 
-Ref: ContactEmail.bankTeam > BankTeam.id
+Ref: ContactEmail.Broker > Broker.id
 
-Ref: ContactPhone.bankTeam > BankTeam.id
+Ref: ContactPhone.Broker > Broker.id

@@ -138,6 +138,7 @@ const BrokersTable: React.FC<{
       </CardHeader>
       <CardContent className="px-0">
         <DataTable
+          view={false}
           columns={columns}
           data={data}
           selecting={false}

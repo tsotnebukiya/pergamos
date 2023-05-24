@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler, useFieldArray } from "react-hook-form";
 import { Sheet, SheetContent, SheetTitle } from "../UI/Sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Dispatch, type SetStateAction, useState } from "react";
@@ -11,44 +11,53 @@ import { useToast } from "pergamos/hooks/useToast";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../UI/Form";
-import { Popover, PopoverContent, PopoverTrigger } from "../UI/Popover";
-import { cn } from "pergamos/utils/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "../UI/Command";
 import { marketsArr } from "../UI/Market";
-import { ScrollArea } from "../UI/ScrollArea";
+import { ComboBox } from "../UI/ComboBox";
+import { cn } from "pergamos/utils/utils";
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
-  market: z.string(),
-  assignedTeam: z.number(),
-  account: z.array(z.string()),
+  market: z.string().nonempty("Market is required"),
+  assignedTeam: z.string().nonempty("Assigned Team is required"),
+  accounts: z.array(
+    z.object({
+      value: z
+        .string()
+        .refine((value) => value !== "", "Please enter Account")
+        .refine((value) => {
+          const numValue = Number(value);
+          return !isNaN(numValue) && numValue > 0 && Number.isInteger(numValue);
+        }, "Account must be a number"),
+    })
+  ),
 });
 
 const BrokerCreate: React.FC<{
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-}> = ({ open, setOpen }) => {
+  bankId: number;
+}> = ({ open, setOpen, bankId }) => {
+  const { data } = api.teams.getAll.useQuery();
+  const teamsArr = data?.map((el) => ({
+    value: el.id.toString(),
+    label: el.name,
+  }));
+
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const { mutate } = api.banks.create.useMutation({
+  const { mutate } = api.brokers.create.useMutation({
     onSuccess: () => {
       setSubmitting(false);
       setOpen(false);
       toast({
         variant: "default",
         title: "Success",
-        description: "Bank created successfully",
+        description: "Broker created successfully",
       });
     },
     onError: (error) => {
@@ -64,11 +73,25 @@ const BrokerCreate: React.FC<{
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onSubmit",
+    defaultValues: {
+      accounts: [{ value: "" }],
+      assignedTeam: "",
+      market: "",
+      name: "",
+    },
   });
-
+  const { fields, append, remove } = useFieldArray({
+    name: "accounts",
+    control: form.control,
+  });
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
     setSubmitting(true);
-    // mutate(data);
+    mutate({
+      bankId: bankId,
+      ...data,
+      assignedTeam: Number(data.assignedTeam),
+      accounts: data.accounts.map((el) => Number(el.value)),
+    });
   };
   return (
     <Sheet
@@ -87,8 +110,13 @@ const BrokerCreate: React.FC<{
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Broker Name</FormLabel>
+                  <FormDescription>Name of the Broker team.</FormDescription>
                   <FormControl>
-                    <Input placeholder="Name" {...field} />
+                    <Input
+                      placeholder="Name"
+                      {...field}
+                      className="max-w-[300px]"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -100,63 +128,85 @@ const BrokerCreate: React.FC<{
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Market</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "w-[200px] justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value
-                            ? marketsArr.find(
-                                (market) =>
-                                  market.value.toLowerCase() === field.value
-                              )?.label
-                            : "Select market"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-
-                    <PopoverContent>
-                      <Command>
-                        <CommandInput placeholder="Search framework..." />
-                        <CommandEmpty>No market found.</CommandEmpty>
-
-                        <CommandGroup>
-                          <ScrollArea className="h-[200px]">
-                            {marketsArr.map((market) => (
-                              <CommandItem
-                                value={market.value}
-                                key={market.value}
-                                onSelect={(value) => {
-                                  form.setValue("market", value);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    market.value.toLowerCase() === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {market.label}
-                              </CommandItem>
-                            ))}
-                          </ScrollArea>
-                        </CommandGroup>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <FormDescription>
+                    Choose market handled by Broker
+                  </FormDescription>
+                  <ComboBox
+                    fieldValue={field.value}
+                    array={marketsArr}
+                    name="market"
+                    onSelect={(value) => form.setValue("market", value)}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="assignedTeam"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Assigned Team</FormLabel>
+                  <FormDescription>
+                    Choose Citi Team interacting with Broker
+                  </FormDescription>
+                  <ComboBox
+                    fieldValue={field.value}
+                    array={teamsArr}
+                    name="team"
+                    onSelect={(value) => form.setValue("assignedTeam", value)}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div>
+              {fields.map((field, index) => (
+                <FormField
+                  control={form.control}
+                  key={field.id}
+                  name={`accounts.${index}`}
+                  render={() => (
+                    <FormItem>
+                      <FormLabel className={cn(index !== 0 && "sr-only")}>
+                        Accounts
+                      </FormLabel>
+                      <FormDescription className={cn(index !== 0 && "sr-only")}>
+                        Add accounts handled by Broker.
+                      </FormDescription>
+                      <FormControl>
+                        <div className="flex gap-2">
+                          <Input
+                            {...form.register(`accounts.${index}.value`)}
+                            className="w-[200px]"
+                          />
+                          {index !== 0 && (
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              onClick={() => remove(index)}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="mt-1"
+                onClick={() => append({ value: "" })}
+              >
+                Add Account
+              </Button>
+            </div>
             <div className="flex justify-between">
               <Button
                 type="button"

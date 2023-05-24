@@ -52,7 +52,7 @@ export const banksRouter = createTRPCRouter({
         amending: true,
         website: true,
         _count: {
-          select: { teams: true },
+          select: { brokers: true },
         },
         makerUser: {
           select: { id: true, name: true },
@@ -88,7 +88,11 @@ export const banksRouter = createTRPCRouter({
         data: {
           name: input.name,
           website: input.website,
-          maker: makerId,
+          makerUser: {
+            connect: {
+              id: makerId,
+            },
+          },
         },
       });
       if (!bank)
@@ -183,7 +187,6 @@ export const banksRouter = createTRPCRouter({
           message: "Bank is already being amended",
         });
       }
-      console.log(ctx.session.user.id);
       const data = {
         bank: input.bankId,
         maker: ctx.session.user.id,

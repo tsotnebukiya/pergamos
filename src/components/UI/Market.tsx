@@ -20,5 +20,5 @@ export const Market: React.FC<{ market: string }> = ({ market }) => {
 };
 
 export const marketsArr = markets.map((market) => {
-  return { value: market, label: <Market market={market} /> };
+  return { value: market.toLowerCase(), label: <Market market={market} /> };
 });

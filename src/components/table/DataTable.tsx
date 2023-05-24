@@ -35,6 +35,7 @@ interface DataTableProps<TData extends { id: string | number }, TValue> {
   selecting?: boolean;
   filters?: FilterOption[];
   actions?: React.ReactNode;
+  view: boolean;
 }
 
 export function DataTable<TData extends { id: string | number }, TValue>({
@@ -45,6 +46,7 @@ export function DataTable<TData extends { id: string | number }, TValue>({
   filters = [],
   actions,
   link,
+  view,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const [rowSelection, setRowSelection] = React.useState({});
@@ -84,6 +86,7 @@ export function DataTable<TData extends { id: string | number }, TValue>({
   return (
     <div className="space-y-4">
       <DataTableToolbar
+        view={view}
         table={table}
         actions={actions}
         {...(filters.length > 0 && { filters })}

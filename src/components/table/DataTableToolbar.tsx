@@ -15,12 +15,14 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   filters?: FilterOption[];
   actions?: React.ReactNode;
+  view:boolean
 }
 
 export function DataTableToolbar<TData>({
   table,
   filters = [],
   actions,
+  view
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getPreFilteredRowModel().rows.length >
@@ -66,7 +68,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex flex-col gap-2 space-x-2 1250:flex-row">
         {actions}
-        <DataTableViewOptions table={table} />
+        {view && <DataTableViewOptions table={table} />}
       </div>
     </div>
   );

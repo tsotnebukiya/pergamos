@@ -73,6 +73,7 @@ const BanksTable: React.FC<{
 }> = ({ data, openSheet }) => {
   return (
     <DataTable
+      view={false}
       columns={columns}
       data={data}
       selecting={false}

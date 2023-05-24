@@ -12,7 +12,6 @@ export const banksRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
-
         select: {
           id: true,
           name: true,
@@ -20,7 +19,15 @@ export const banksRouter = createTRPCRouter({
           image: true,
           active: true,
           amending: true,
-
+          brokers: {
+            select: {
+              id: true,
+              name: true,
+              market: true,
+              accounts: true,
+              assignedTeam: true,
+            },
+          },
           audits: {
             orderBy: {
               createdAt: "desc",

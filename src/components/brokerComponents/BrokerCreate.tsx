@@ -90,7 +90,7 @@ const BrokerCreate: React.FC<{
       bankId: bankId,
       ...data,
       assignedTeam: Number(data.assignedTeam),
-      accounts: data.accounts.map((el) => Number(el.value)),
+      accounts: data.accounts.map((el) => el.value),
     });
   };
   return (

@@ -8,7 +8,12 @@ const schema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
   market: z.string().nonempty("Market is required"),
   assignedTeam: z.number().min(1, "Team is required"),
-  accounts: z.array(z.number().min(1, "Account is required")),
+  accounts: z.array(
+    z.string().refine((value) => {
+      const numValue = Number(value);
+      return !isNaN(numValue) && numValue > 0 && Number.isInteger(numValue);
+    }, "Account must be a number")
+  ),
 });
 
 export const brokersRouter = createTRPCRouter({
@@ -48,6 +53,16 @@ export const brokersRouter = createTRPCRouter({
           },
         },
       });
+      if (broker) {
+        await ctx.prisma.bankAccounts.createMany({
+          data: input.accounts.map((acc) => {
+            return {
+              account: acc,
+              broker: broker.id,
+            };
+          }),
+        });
+      }
       return broker;
     }),
   getOne: protectedProcedure

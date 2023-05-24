@@ -135,9 +135,9 @@ model Broker {
   market        String
   assignedTeam  Int
   citiTeam      CitiTeam       @relation("BrokersToCitiTeam", fields: [assignedTeam], references: [id])
-  contactEmails ContactEmail[]
-  contactPhones ContactPhone[]
-  accounts      BankAccounts[]
+  contactEmails ContactEmail[] @relation("EmailToBroker")
+  contactPhones ContactPhone[] @relation("PhoneToBroker")
+  accounts      BankAccounts[] @relation("BankAccToBroker")
   bankId        Bank           @relation("Brokers", fields: [bank], references: [id])
   makerUser     User           @relation("TeamMaker", fields: [maker], references: [id])
   checkerUser   User?          @relation("TeamChecker", fields: [checker], references: [id])
@@ -151,28 +151,28 @@ model Broker {
 model BankAccounts {
     id            String     @id @default(cuid())
     account       String
-    Broker      Int 
-    BrokerId    Broker   @relation(fields: [Broker], references: [id])
+    broker      Int 
+    brokerId    Broker   @relation("BankAccToBroker",fields: [broker], references: [id])
 
-    @@index([Broker])
+    @@index([broker])
 }
 
 model ContactEmail {
   id         String   @id @default(cuid())
   email      String
-  Broker   Int
-  BrokerId Broker @relation(fields: [Broker], references: [id])
+  broker   Int
+  brokerId Broker @relation("EmailToBroker",fields: [broker], references: [id])
 
-  @@index([Broker])
+  @@index([broker])
 }
 
 model ContactPhone {
   id         String   @id @default(cuid())
   phone      String
-  Broker   Int
-  BrokerId Broker @relation(fields: [Broker], references: [id])
+  broker   Int
+  brokerId Broker @relation("PhoneToBroker",fields: [broker], references: [id])
 
-  @@index([Broker])
+  @@index([broker])
 }
 
 

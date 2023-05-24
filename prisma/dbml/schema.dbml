@@ -126,22 +126,22 @@ Table Broker {
 Table BankAccounts {
   id String [pk]
   account String [not null]
-  Broker Int [not null]
-  BrokerId Broker [not null]
+  broker Int [not null]
+  brokerId Broker [not null]
 }
 
 Table ContactEmail {
   id String [pk]
   email String [not null]
-  Broker Int [not null]
-  BrokerId Broker [not null]
+  broker Int [not null]
+  brokerId Broker [not null]
 }
 
 Table ContactPhone {
   id String [pk]
   phone String [not null]
-  Broker Int [not null]
-  BrokerId Broker [not null]
+  broker Int [not null]
+  brokerId Broker [not null]
 }
 
 Enum Role {
@@ -178,8 +178,8 @@ Ref: Broker.maker > User.id
 
 Ref: Broker.checker > User.id
 
-Ref: BankAccounts.Broker > Broker.id
+Ref: BankAccounts.broker > Broker.id
 
-Ref: ContactEmail.Broker > Broker.id
+Ref: ContactEmail.broker > Broker.id
 
-Ref: ContactPhone.Broker > Broker.id
+Ref: ContactPhone.broker > Broker.id

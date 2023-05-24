@@ -64,6 +64,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
   const [openActivate, setOpenActivate] = useState(false);
   const query = useRouter().query.bankId as string;
   const { data } = api.banks.getOne.useQuery({ id: Number(query) });
+  console.log(data);
   if (!data) return null;
   return (
     <main>

@@ -20,10 +20,12 @@ import {
 import { marketsArr } from "../UI/Market";
 import { ComboBox } from "../UI/ComboBox";
 import { cn } from "pergamos/utils/utils";
+import { useRouter } from "next/router";
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
   market: z.string().nonempty("Market is required"),
   assignedTeam: z.string().nonempty("Assigned Team is required"),
+  bankId: z.string(),
   accounts: z.array(
     z.object({
       value: z
@@ -40,20 +42,41 @@ const formSchema = z.object({
 const BrokerCreate: React.FC<{
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  bankId: number;
+  bankId?: number;
 }> = ({ open, setOpen, bankId }) => {
-  const { data } = api.teams.getAll.useQuery();
-  const teamsArr = data?.map((el) => ({
+  const router = useRouter();
+  const { data: teamsData } = api.teams.getAll.useQuery();
+  const { data: banksData } = api.banks.getAll.useQuery();
+  const teamsArr = teamsData?.map((el) => ({
     value: el.id.toString(),
     label: el.name,
   }));
-
+  const banksArr = banksData?.map((el) => ({
+    value: el.id.toString(),
+    label: el.name,
+  }));
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    mode: "onSubmit",
+    defaultValues: {
+      accounts: [{ value: "" }],
+      assignedTeam: "",
+      market: "",
+      name: "",
+      bankId: "",
+    },
+  });
   const { mutate } = api.brokers.create.useMutation({
-    onSuccess: () => {
+    onSuccess: async (data) => {
       setSubmitting(false);
       setOpen(false);
+      await router.push(
+        `/dashboard/banks/${
+          bankId ? bankId : form.getValues().bankId
+        }/brokers/${data.id}`
+      );
       toast({
         variant: "default",
         title: "Success",
@@ -70,16 +93,7 @@ const BrokerCreate: React.FC<{
       });
     },
   });
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    mode: "onSubmit",
-    defaultValues: {
-      accounts: [{ value: "" }],
-      assignedTeam: "",
-      market: "",
-      name: "",
-    },
-  });
+
   const { fields, append, remove } = useFieldArray({
     name: "accounts",
     control: form.control,
@@ -87,8 +101,8 @@ const BrokerCreate: React.FC<{
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
     setSubmitting(true);
     mutate({
-      bankId: bankId,
       ...data,
+      bankId: bankId ? bankId : Number(data.bankId),
       assignedTeam: Number(data.assignedTeam),
       accounts: data.accounts.map((el) => el.value),
     });
@@ -122,6 +136,26 @@ const BrokerCreate: React.FC<{
                 </FormItem>
               )}
             />
+            {!bankId && (
+              <FormField
+                control={form.control}
+                name="bankId"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Assigned Bank</FormLabel>
+                    <FormDescription>Choose associated Bank</FormDescription>
+                    <ComboBox
+                      fieldValue={field.value}
+                      array={banksArr}
+                      name="team"
+                      onSelect={(value) => form.setValue("bankId", value)}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="market"

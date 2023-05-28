@@ -20,12 +20,21 @@ export const banksRouter = createTRPCRouter({
           active: true,
           amending: true,
           brokers: {
+            orderBy: {
+              createdAt: "desc",
+            },
             select: {
               id: true,
+              bank: true,
               name: true,
+              active: true,
               market: true,
-              accounts: true,
-              assignedTeam: true,
+              citiTeam: true,
+              accounts: {
+                select: {
+                  account: true,
+                },
+              },
             },
           },
           audits: {

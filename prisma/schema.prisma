@@ -134,10 +134,12 @@ model Broker {
   bank          Int
   market        String
   assignedTeam  Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   citiTeam      CitiTeam       @relation("BrokersToCitiTeam", fields: [assignedTeam], references: [id])
   contactEmails ContactEmail[] @relation("EmailToBroker")
   contactPhones ContactPhone[] @relation("PhoneToBroker")
-  accounts      BankAccounts[] @relation("BankAccToBroker")
+  accounts      BrokerAccounts[] @relation("BrokerAccToBroker")
   bankId        Bank           @relation("Brokers", fields: [bank], references: [id])
   makerUser     User           @relation("TeamMaker", fields: [maker], references: [id])
   checkerUser   User?          @relation("TeamChecker", fields: [checker], references: [id])
@@ -148,11 +150,11 @@ model Broker {
   @@index([assignedTeam])
 }
 
-model BankAccounts {
+model BrokerAccounts {
     id            String     @id @default(cuid())
     account       String
     broker      Int 
-    brokerId    Broker   @relation("BankAccToBroker",fields: [broker], references: [id])
+    brokerId    Broker   @relation("BrokerAccToBroker",fields: [broker], references: [id], onDelete: Cascade)
 
     @@index([broker])
 }

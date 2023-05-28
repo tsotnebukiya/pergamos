@@ -30,7 +30,6 @@ const columns = [
       <DataTableColumnHeader column={column} title="Website" />
     ),
     cell: (props) => {
-      console.log(props.getValue());
       return (
         <div className="flex space-x-2 font-medium ">
           <span className="max-w-[150px]">
@@ -48,7 +47,7 @@ const columns = [
     enableSorting: true,
     enableHiding: false,
   }),
-  columnHelper.accessor("_count.teams", {
+  columnHelper.accessor("_count", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Brokers" />
     ),
@@ -56,7 +55,7 @@ const columns = [
       return (
         <div className="flex space-x-2 ">
           <span className=" max-w-[300px] truncate font-medium">
-            {props.getValue()}
+            {props.getValue().brokers}
           </span>
         </div>
       );

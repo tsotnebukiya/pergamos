@@ -13,49 +13,13 @@ import BrokerCreate from "pergamos/components/brokerComponents/BrokerCreate";
 import BankAmend from "pergamos/components/bankComponents/BankAmend";
 import BankApprove from "pergamos/components/bankComponents/BankAmendApprove";
 import BankActivate from "pergamos/components/bankComponents/BankActivate";
-
-const brokers = [
-  {
-    id: "5",
-    name: "Broker 1",
-    accounts: ["903"],
-    market: "icsd",
-    assignedTeam: {
-      name: "ICSD team",
-      id: 1,
-    },
-  },
-  {
-    id: "2",
-    name: "Broker 2",
-    accounts: ["2653"],
-    market: "us",
-    assignedTeam: {
-      name: "ICSD team",
-      id: 1,
-    },
-  },
-  {
-    id: "4",
-    name: "Broker 3",
-    accounts: ["2412"],
-    market: "za",
-    assignedTeam: {
-      name: "ICSD team",
-      id: 1,
-    },
-  },
-  {
-    id: "10",
-    name: "Broker 10",
-    accounts: ["3412", "2312", "3412"],
-    market: "uk",
-    assignedTeam: {
-      name: "ICSD team",
-      id: 1,
-    },
-  },
-];
+import EmptyState from "pergamos/components/UI/EmptyState";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "pergamos/components/UI/Card";
 
 const BrokerOverviewPage: NextPageWithLayout = () => {
   const [openBrokerCreate, setOpenBrokerCreate] = useState(false);
@@ -64,7 +28,6 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
   const [openActivate, setOpenActivate] = useState(false);
   const query = useRouter().query.bankId as string;
   const { data } = api.banks.getOne.useQuery({ id: Number(query) });
-  console.log(data);
   if (!data) return null;
   return (
     <main>
@@ -104,21 +67,29 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
               cardClass2="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-1 space-y-4"
               cardClass1="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-2 "
             />
-            {/* <EmptyState
-              text="broker"
-              cardClass="h-full flex align-center justify-center col-span-1 md:col-span-2 lg:col-start-1 lg:col-span-5 lg:row-span-2 border-none shadow-none"
-              action={() => {
-                setOpenBrokerCreate(true);
-              }}
-            /> */}
-            <BrokersTable
-              bankId={query}
-              data={brokers}
-              openSheet={() => {
-                setOpenBrokerCreate(true);
-              }}
-              cardClass="col-span-1 md:col-span-2 lg:col-start-1 lg:col-span-5 lg:row-span-2 border-none shadow-none"
-            />
+            {data.brokers.length > 0 ? (
+              <Card className="col-span-1 border-none shadow-none md:col-span-2 lg:col-span-5 lg:col-start-1 lg:row-span-2">
+                <CardHeader className="px-0">
+                  <CardTitle>Brokers</CardTitle>
+                </CardHeader>
+                <CardContent className="px-0">
+                  <BrokersTable
+                    data={data.brokers}
+                    openSheet={() => {
+                      setOpenBrokerCreate(true);
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <EmptyState
+                text="broker"
+                cardClass="h-full flex align-center justify-center col-span-1 md:col-span-2 lg:col-start-1 lg:col-span-5 lg:row-span-2 border-none shadow-none"
+                action={() => {
+                  setOpenBrokerCreate(true);
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

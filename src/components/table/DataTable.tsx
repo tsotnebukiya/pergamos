@@ -27,10 +27,13 @@ import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar, type FilterOption } from "./DataTableToolbar";
 import { useRouter } from "next/router";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface DataTableProps<TData extends { id: string | number }, TValue> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnDef<TData, any>[];
   data: TData[];
   link?: string;
+  broker?: boolean;
   pageSize?: number;
   selecting?: boolean;
   filters?: FilterOption[];
@@ -38,13 +41,17 @@ interface DataTableProps<TData extends { id: string | number }, TValue> {
   view: boolean;
 }
 
-export function DataTable<TData extends { id: string | number }, TValue>({
+export function DataTable<
+  TData extends { id: string | number; bank?: number },
+  TValue
+>({
   columns,
   data,
   pageSize,
   selecting,
   filters = [],
   actions,
+  broker,
   link,
   view,
 }: DataTableProps<TData, TValue>) {
@@ -117,9 +124,16 @@ export function DataTable<TData extends { id: string | number }, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={link && "cursor-pointer"}
+                  className={link || broker ? "cursor-pointer" : ""}
                   onClick={() => {
                     void (link && router.push(`${link}/${row.original.id}`));
+                    void (
+                      broker &&
+                      row.original.bank &&
+                      router.push(
+                        `/dashboard/banks/${row.original.bank}/brokers/${row.original.id}`
+                      )
+                    );
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

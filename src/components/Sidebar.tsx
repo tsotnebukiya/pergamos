@@ -40,6 +40,18 @@ export function Sidebar({ className }: SidebarProps) {
                   Banks
                 </Button>
               </Link>
+              <Link href="/dashboard/brokers">
+                <Button
+                  variant={
+                    currentPath === "/dashboard/banks" ? "secondary" : "ghost"
+                  }
+                  size="lg"
+                  className="w-full justify-start"
+                >
+                  <UsersIcon className="mr-2 h-5 w-5" />
+                  Brokers
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

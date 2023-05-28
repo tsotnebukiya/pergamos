@@ -5,17 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card";
 import { Button } from "../UI/Button";
 import Link from "next/link";
 import { Market } from "../UI/Market";
+import { type RouterOutputs } from "pergamos/utils/api";
 
-type Broker = {
-  id: string;
-  name: string;
-  market: string;
-  accounts: string[];
-  assignedTeam: {
-    name: string;
-    id: number;
-  };
-};
+type Broker = RouterOutputs["brokers"]["getAll"][number];
 
 const columnHelper = createColumnHelper<Broker>();
 
@@ -47,15 +39,21 @@ const columns = [
             <span className="max-w-[300px]">
               {props
                 .getValue()
-                .map((acc, index) => `${index > 0 ? " | " : ""}${acc}`)}
+                .map((acc, index) => `${index > 0 ? " | " : ""}${acc.account}`)}
             </span>
           </div>
         </div>
       );
     },
     filterFn: (row, id, value) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const accountValues = row.getValue(id) as string[];
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion, @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const accountValues = row
+        .getValue(id)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .map((el: { account: any }) => el.account) as string[];
+      console.log(accountValues);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
       return value.some((el: any) => accountValues.includes(el));
     },
@@ -75,7 +73,6 @@ const columns = [
       );
     },
     filterFn: (row, id, value) => {
-      console.log(value, row.getValue(id));
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const accountValues = row.getValue(id) as string;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
@@ -84,7 +81,7 @@ const columns = [
     enableSorting: true,
     enableHiding: false,
   }),
-  columnHelper.accessor("assignedTeam", {
+  columnHelper.accessor("citiTeam", {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Assigned Team" />
     ),
@@ -108,14 +105,13 @@ const columns = [
 
 const BrokersTable: React.FC<{
   data: Broker[];
-  cardClass?: string;
-  bankId: string;
+  pageSize?: number;
   openSheet: () => void;
-}> = ({ data, cardClass, bankId, openSheet }) => {
+}> = ({ data, openSheet, pageSize }) => {
   const accounts = Array.from(
     new Set(data.flatMap((broker) => broker.accounts))
-  ).map((value) => ({ value: value }));
-
+  ).map((value) => ({ value: value.account }));
+  console.log(accounts);
   const markets = Array.from(new Set(data.map((broker) => broker.market))).map(
     (value) => ({
       value: value,
@@ -131,39 +127,33 @@ const BrokersTable: React.FC<{
       ),
     })
   );
+  console.log(pageSize);
   return (
-    <Card className={cardClass}>
-      <CardHeader className="px-0">
-        <CardTitle>Brokers</CardTitle>
-      </CardHeader>
-      <CardContent className="px-0">
-        <DataTable
-          view={false}
-          columns={columns}
-          data={data}
-          selecting={false}
-          pageSize={5}
-          link={`/dashboard/banks/${bankId}/brokers`}
-          filters={[
-            {
-              columnName: "accounts",
-              title: "Account",
-              options: [...accounts],
-            },
-            {
-              columnName: "market",
-              title: "Market",
-              options: [...markets],
-            },
-          ]}
-          actions={
-            <Button className="h-8" onClick={openSheet}>
-              Add New
-            </Button>
-          }
-        />
-      </CardContent>
-    </Card>
+    <DataTable
+      view={false}
+      columns={columns}
+      data={data}
+      selecting={false}
+      pageSize={pageSize || 5}
+      broker={true}
+      filters={[
+        {
+          columnName: "accounts",
+          title: "Account",
+          options: [...accounts],
+        },
+        {
+          columnName: "market",
+          title: "Market",
+          options: [...markets],
+        },
+      ]}
+      actions={
+        <Button className="h-8" onClick={openSheet}>
+          Add New
+        </Button>
+      }
+    />
   );
 };
 

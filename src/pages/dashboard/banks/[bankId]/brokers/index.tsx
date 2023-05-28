@@ -12,3 +12,7 @@ BrokersOfBank.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default BrokersOfBank;
+
+export const getServerSideProps = () => {
+  return { redirect: { destination: "/dashboard/brokers", permanent: false } };
+};

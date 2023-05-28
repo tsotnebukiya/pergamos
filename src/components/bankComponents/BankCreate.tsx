@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "../UI/Form";
 import { regexUrl } from "pergamos/utils/utils";
+import { useRouter } from "next/router";
 
 const formSchema = z.object({
   website: z.string().regex(regexUrl, "Invalid URL"),
@@ -27,19 +28,19 @@ const BankCreate: React.FC<{
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }> = ({ open, setOpen }) => {
+  const router = useRouter();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const ctx = api.useContext();
   const { mutate } = api.banks.create.useMutation({
-    onSuccess: () => {
+    onSuccess: async (data) => {
       setSubmitting(false);
       setOpen(false);
+      await router.push(`/dashboard/banks/${data.id}`);
       toast({
         variant: "default",
         title: "Success",
         description: "Bank created successfully",
       });
-      void ctx.banks.getAll.invalidate();
     },
     onError: (error) => {
       setSubmitting(false);

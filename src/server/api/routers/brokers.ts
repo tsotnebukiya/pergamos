@@ -54,7 +54,7 @@ export const brokersRouter = createTRPCRouter({
         },
       });
       if (broker) {
-        await ctx.prisma.bankAccounts.createMany({
+        await ctx.prisma.brokerAccounts.createMany({
           data: input.accounts.map((acc) => {
             return {
               account: acc,
@@ -92,4 +92,25 @@ export const brokersRouter = createTRPCRouter({
       });
       return broker;
     }),
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    const broker = await ctx.prisma.broker.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        bank: true,
+        name: true,
+        active: true,
+        market: true,
+        citiTeam: true,
+        accounts: {
+          select: {
+            account: true,
+          },
+        },
+      },
+    });
+    return broker;
+  }),
 });

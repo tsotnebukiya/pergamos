@@ -21,7 +21,7 @@ const BrokerContacts: React.FC<{
       </CardContent>
       <Separator orientation="horizontal" />
       <CardHeader>
-        <CardTitle>Numbers</CardTitle>
+        <CardTitle>Phone Numbers</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-10 gap-2">
         <BrokerChipList

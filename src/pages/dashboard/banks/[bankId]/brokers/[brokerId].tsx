@@ -13,12 +13,16 @@ import { TabsTrigger } from "pergamos/components/UI/Tabs";
 import { TabsContent } from "pergamos/components/UI/Tabs";
 import BrokerRelated from "pergamos/components/brokerComponents/BrokerRelated";
 import BrokerOverview from "pergamos/components/brokerComponents/BrokerOverview";
+import BrokerActivate from "pergamos/components/brokerComponents/BrokerActivate";
+import BrokerAmend from "pergamos/components/brokerComponents/BrokerAmend";
+import BrokerAmendApprove from "pergamos/components/brokerComponents/BrokerAmendApprove";
 
 const BrokerOverviewPage: NextPageWithLayout = () => {
   const query = useRouter().query.brokerId;
   const { data } = api.brokers.getOne.useQuery({ id: Number(query) });
-  console.log(data);
-
+  const [activateOpen, setActivateOpen] = useState(false);
+  const [amendOpen, setAmendOpen] = useState(false);
+  const [approveOpen, setApproveOpen] = useState(false);
   if (!data) return null;
   return (
     <main>
@@ -43,13 +47,21 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">{data.name}</h2>
           {!data.active ? (
-            <Button size="sm">Activate</Button>
+            <Button size="sm" onClick={() => setActivateOpen(true)}>
+              Activate
+            </Button>
           ) : data.amending ? (
-            <Button size="sm" variant="outline">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setApproveOpen(true)}
+            >
               Pending Changes
             </Button>
           ) : (
-            <Button size="sm">Edit</Button>
+            <Button size="sm" onClick={() => setAmendOpen(true)}>
+              Edit
+            </Button>
           )}
         </div>
         <Tabs defaultValue="overview">
@@ -65,6 +77,26 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
           </TabsContent>
         </Tabs>
       </div>
+      {activateOpen && (
+        <BrokerActivate
+          brokerId={data.id}
+          open={activateOpen}
+          setOpen={setActivateOpen}
+        />
+      )}
+      {amendOpen && <BrokerAmend open={amendOpen} setOpen={setAmendOpen} />}
+
+      {data.audits[0] && (
+        <BrokerAmendApprove
+          brokerId={data.id}
+          amendId={data.audits[0].id}
+          open={approveOpen}
+          setOpen={setApproveOpen}
+          name={data.audits[0].name || undefined}
+          assignedTeam={data.audits[0].citiTeam?.name}
+          market={data.audits[0].market || undefined}
+        />
+      )}
     </main>
   );
 };

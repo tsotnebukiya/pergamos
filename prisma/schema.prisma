@@ -70,8 +70,10 @@ model User {
   checkedBanks  Bank[]     @relation("BankChecker")
   createdTeams  Broker[] @relation("TeamMaker")
   checkedTeams  Broker[] @relation("TeamChecker")
-  createdAudits BankAudit[]@relation("AuditMaker")
-  checkedAudits BankAudit[]@relation("AuditChecker")
+  createdBanksAudits BankAudit[]@relation("BankAuditMaker")
+  checkedBankAudits BankAudit[]@relation("BankAuditChecker")
+  createdTeamsAudits BrokerAudit[]@relation("BrokerAuditMaker")
+  checkedTeamsAudits BrokerAudit[]@relation("BrokerAuditChecker")
 }
 
 model CitiTeam {
@@ -79,6 +81,7 @@ model CitiTeam {
   name      String
   members   User[]     @relation("TeamMembers")
   Brokers Broker[] @relation("BrokersToCitiTeam")
+  BrokerAudits BrokerAudit[] @relation("BrokerAuditsCitiTeam")
 }
 
 model Bank {
@@ -115,8 +118,8 @@ model BankAudit {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   bankId    Bank     @relation("BankAudits",fields: [bank], references: [id], onDelete: Cascade)
-  makerUser User       @relation("AuditMaker", fields: [maker], references: [id])
-  checkerUser User?    @relation("AuditChecker", fields: [checker], references: [id])
+  makerUser User       @relation("BankAuditMaker", fields: [maker], references: [id])
+  checkerUser User?    @relation("BankAuditChecker", fields: [checker], references: [id])
 
   @@index([bank])
   @@index([maker])
@@ -137,6 +140,7 @@ model Broker {
   assignedTeam  Int
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  audits       BrokerAudit[]  @relation("BrokerAudits")
   citiTeam      CitiTeam       @relation("BrokersToCitiTeam", fields: [assignedTeam], references: [id])
   contactEmails ContactEmail[] @relation("EmailToBroker")
   contactPhones ContactPhone[] @relation("PhoneToBroker")
@@ -146,6 +150,28 @@ model Broker {
   checkerUser   User?          @relation("TeamChecker", fields: [checker], references: [id])
 
   @@index([bank])
+  @@index([maker])
+  @@index([checker])
+  @@index([assignedTeam])
+}
+
+model BrokerAudit {
+  id        Int        @id @default(autoincrement())
+  broker      Int
+  maker     String
+  checker   String?
+  name      String?
+  market   String?
+  assignedTeam    Int?
+  status    Status     @default(PENDING)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  citiTeam  CitiTeam?       @relation("BrokerAuditsCitiTeam",fields: [assignedTeam], references: [id])
+  brokerId  Broker     @relation("BrokerAudits",fields: [broker], references: [id], onDelete: Cascade)
+  makerUser User       @relation("BrokerAuditMaker", fields: [maker], references: [id])
+  checkerUser User?    @relation("BrokerAuditChecker", fields: [checker], references: [id])
+
+  @@index([broker])
   @@index([maker])
   @@index([checker])
   @@index([assignedTeam])
@@ -163,7 +189,7 @@ model BrokerAccounts {
 model ContactEmail {
   id         String   @id @default(cuid())
   email      String
-  name       String?
+
   broker   Int
   brokerId Broker @relation("EmailToBroker",fields: [broker], references: [id])
 
@@ -173,6 +199,7 @@ model ContactEmail {
 model ContactPhone {
   id         String   @id @default(cuid())
   phone      String
+    name       String?
   broker   Int
   brokerId Broker @relation("PhoneToBroker",fields: [broker], references: [id])
 

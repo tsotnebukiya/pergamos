@@ -61,8 +61,10 @@ Table User {
   checkedBanks Bank [not null]
   createdTeams Broker [not null]
   checkedTeams Broker [not null]
-  createdAudits BankAudit [not null]
-  checkedAudits BankAudit [not null]
+  createdBanksAudits BankAudit [not null]
+  checkedBankAudits BankAudit [not null]
+  createdTeamsAudits BrokerAudit [not null]
+  checkedTeamsAudits BrokerAudit [not null]
 }
 
 Table CitiTeam {
@@ -70,6 +72,7 @@ Table CitiTeam {
   name String [not null]
   members User [not null]
   Brokers Broker [not null]
+  BrokerAudits BrokerAudit [not null]
 }
 
 Table Bank {
@@ -117,11 +120,29 @@ Table Broker {
   assignedTeam Int [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  audits BrokerAudit [not null]
   citiTeam CitiTeam [not null]
   contactEmails ContactEmail [not null]
   contactPhones ContactPhone [not null]
   accounts BrokerAccounts [not null]
   bankId Bank [not null]
+  makerUser User [not null]
+  checkerUser User
+}
+
+Table BrokerAudit {
+  id Int [pk, increment]
+  broker Int [not null]
+  maker String [not null]
+  checker String
+  name String
+  market String
+  assignedTeam Int
+  status Status [not null, default: 'PENDING']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  citiTeam CitiTeam
+  brokerId Broker [not null]
   makerUser User [not null]
   checkerUser User
 }
@@ -136,7 +157,6 @@ Table BrokerAccounts {
 Table ContactEmail {
   id String [pk]
   email String [not null]
-  name String
   broker Int [not null]
   brokerId Broker [not null]
 }
@@ -144,6 +164,7 @@ Table ContactEmail {
 Table ContactPhone {
   id String [pk]
   phone String [not null]
+  name String
   broker Int [not null]
   brokerId Broker [not null]
 }
@@ -181,6 +202,14 @@ Ref: Broker.bank > Bank.id
 Ref: Broker.maker > User.id
 
 Ref: Broker.checker > User.id
+
+Ref: BrokerAudit.assignedTeam > CitiTeam.id
+
+Ref: BrokerAudit.broker > Broker.id [delete: Cascade]
+
+Ref: BrokerAudit.maker > User.id
+
+Ref: BrokerAudit.checker > User.id
 
 Ref: BrokerAccounts.broker > Broker.id [delete: Cascade]
 

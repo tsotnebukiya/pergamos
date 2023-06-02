@@ -231,7 +231,7 @@ export const banksRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const bank = await ctx.prisma.bank.findUniqueOrThrow({
+      await ctx.prisma.bank.findUniqueOrThrow({
         where: { id: input.bankId },
       });
       const bankAudit = await ctx.prisma.bankAudit.findUniqueOrThrow({

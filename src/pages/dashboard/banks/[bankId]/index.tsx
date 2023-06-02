@@ -96,6 +96,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
       {openBankdAmend && (
         <BankAmend open={openBankdAmend} setOpen={setOpenBankAmend} />
       )}
+
       {openBrokerCreate && (
         <BrokerCreate
           open={openBrokerCreate}
@@ -103,6 +104,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
           bankId={Number(query)}
         />
       )}
+
       {data.audits[0] && (
         <BankApprove
           bankId={data.id}

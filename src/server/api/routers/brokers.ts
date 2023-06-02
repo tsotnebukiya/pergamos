@@ -76,6 +76,14 @@ export const brokersRouter = createTRPCRouter({
           id: true,
           name: true,
           active: true,
+          market: true,
+          amending: true,
+          citiTeam: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           bankId: {
             select: {
               name: true,

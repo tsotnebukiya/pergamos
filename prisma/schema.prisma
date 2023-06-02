@@ -130,7 +130,8 @@ model Broker {
   name          String         @unique
   maker         String
   checker       String?
-  active      Boolean        @default(false)
+  active        Boolean        @default(false)
+  amending      Boolean        @default(false)
   bank          Int
   market        String
   assignedTeam  Int
@@ -162,6 +163,7 @@ model BrokerAccounts {
 model ContactEmail {
   id         String   @id @default(cuid())
   email      String
+  name       String?
   broker   Int
   brokerId Broker @relation("EmailToBroker",fields: [broker], references: [id])
 

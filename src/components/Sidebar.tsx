@@ -43,7 +43,7 @@ export function Sidebar({ className }: SidebarProps) {
               <Link href="/dashboard/brokers">
                 <Button
                   variant={
-                    currentPath === "/dashboard/banks" ? "secondary" : "ghost"
+                    currentPath === "/dashboard/brokers" ? "secondary" : "ghost"
                   }
                   size="lg"
                   className="w-full justify-start"

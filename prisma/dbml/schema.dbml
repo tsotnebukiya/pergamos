@@ -111,6 +111,7 @@ Table Broker {
   maker String [not null]
   checker String
   active Boolean [not null, default: false]
+  amending Boolean [not null, default: false]
   bank Int [not null]
   market String [not null]
   assignedTeam Int [not null]
@@ -135,6 +136,7 @@ Table BrokerAccounts {
 Table ContactEmail {
   id String [pk]
   email String [not null]
+  name String
   broker Int [not null]
   brokerId Broker [not null]
 }

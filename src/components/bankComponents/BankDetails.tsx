@@ -35,7 +35,7 @@ const BankDetails: React.FC<{
                 className="hover:underline"
                 target="_blank"
               >
-                <Button variant="link" className="h-0 items-start py-0">
+                <Button variant="link" className="h-0 items-start p-0">
                   {bank.website}
                 </Button>
               </a>
@@ -43,10 +43,10 @@ const BankDetails: React.FC<{
             <div className="flex justify-between">
               <span>Created By</span>
               <Link
-                href={`dashboard/users/${bank.makerUser.id}`}
+                href={`/dashboard/users/${bank.makerUser.id}`}
                 className="items-start"
               >
-                <Button variant="link" className="h-0 items-start py-0">
+                <Button variant="link" className="h-0 items-start p-0">
                   {bank.makerUser.name}
                 </Button>
               </Link>
@@ -55,8 +55,8 @@ const BankDetails: React.FC<{
               <div className="flex justify-between">
                 <span>Approved By</span>
 
-                <Link href={`dashboard/users/${bank.checkerUser.id}`}>
-                  <Button variant="link" className="h-10 items-start py-0">
+                <Link href={`/dashboard/users/${bank.checkerUser.id}`}>
+                  <Button variant="link" className="h-10 items-start p-0">
                     {bank.checkerUser.name}
                   </Button>
                 </Link>

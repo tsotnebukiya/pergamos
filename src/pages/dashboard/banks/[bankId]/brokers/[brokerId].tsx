@@ -7,12 +7,12 @@ import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
 import { Button } from "pergamos/components/UI/Button";
-import BrokersTable from "pergamos/components/brokerComponents/BrokersTable";
-import BankDetails from "pergamos/components/bankComponents/BankDetails";
-import BrokerCreate from "pergamos/components/brokerComponents/BrokerCreate";
-import BankAmend from "pergamos/components/bankComponents/BankAmend";
-import BankApprove from "pergamos/components/bankComponents/BankAmendApprove";
-import BankActivate from "pergamos/components/bankComponents/BankActivate";
+import { Tabs } from "pergamos/components/UI/Tabs";
+import { TabsList } from "pergamos/components/UI/Tabs";
+import { TabsTrigger } from "pergamos/components/UI/Tabs";
+import { TabsContent } from "pergamos/components/UI/Tabs";
+import BrokerRelated from "pergamos/components/brokerComponents/BrokerRelated";
+import BrokerOverview from "pergamos/components/brokerComponents/BrokerOverview";
 
 const BrokerOverviewPage: NextPageWithLayout = () => {
   const query = useRouter().query.brokerId;
@@ -39,7 +39,32 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
           },
         ]}
       />
-      Hey
+      <div className="container mx-auto py-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight">{data.name}</h2>
+          {!data.active ? (
+            <Button size="sm">Activate</Button>
+          ) : data.amending ? (
+            <Button size="sm" variant="outline">
+              Pending Changes
+            </Button>
+          ) : (
+            <Button size="sm">Edit</Button>
+          )}
+        </div>
+        <Tabs defaultValue="overview">
+          <TabsList className="mb-4 mt-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="related">Related</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview">
+            <BrokerOverview broker={data} />
+          </TabsContent>
+          <TabsContent value="related">
+            <BrokerRelated />
+          </TabsContent>
+        </Tabs>
+      </div>
     </main>
   );
 };

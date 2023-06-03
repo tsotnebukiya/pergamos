@@ -16,6 +16,7 @@ import BrokerOverview from "pergamos/components/brokerComponents/BrokerOverview"
 import BrokerActivate from "pergamos/components/brokerComponents/BrokerActivate";
 import BrokerAmend from "pergamos/components/brokerComponents/BrokerAmend";
 import BrokerAmendApprove from "pergamos/components/brokerComponents/BrokerAmendApprove";
+import BrokerAddItems from "pergamos/components/brokerComponents/BrokerAddItems";
 
 const BrokerOverviewPage: NextPageWithLayout = () => {
   const query = useRouter().query.brokerId;
@@ -23,6 +24,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
   const [activateOpen, setActivateOpen] = useState(false);
   const [amendOpen, setAmendOpen] = useState(false);
   const [approveOpen, setApproveOpen] = useState(false);
+
   if (!data) return null;
   return (
     <main>

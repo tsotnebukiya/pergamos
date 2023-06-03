@@ -113,6 +113,24 @@ export const brokersRouter = createTRPCRouter({
           checkerUser: {
             select: { id: true, name: true },
           },
+          contactEmails: {
+            select: {
+              email: true,
+              id: true,
+            },
+          },
+          accounts: {
+            select: {
+              account: true,
+              id: true,
+            },
+          },
+          contactPhones: {
+            select: {
+              phone: true,
+              id: true,
+            },
+          },
         },
       });
       return broker;
@@ -319,6 +337,21 @@ export const brokersRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const broker = await ctx.prisma.broker.findUniqueOrThrow({
+        where: { id: input.brokerId },
+      });
+      if (!broker) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Broker does not exist",
+        });
+      }
+      if (!broker.active) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Broker is not active",
+        });
+      }
       if (input.type === "Email") {
         const emails = await ctx.prisma.contactEmail.createMany({
           data: input.values.map((value) => ({

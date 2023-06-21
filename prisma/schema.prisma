@@ -74,6 +74,8 @@ model User {
   checkedBankAudits BankAudit[]@relation("BankAuditChecker")
   createdTeamsAudits BrokerAudit[]@relation("BrokerAuditMaker")
   checkedTeamsAudits BrokerAudit[]@relation("BrokerAuditChecker")
+  createdSSI    SSI[]      @relation("SSIMaker")
+  checkedSSI    SSI[]      @relation("SSIChecker")
 }
 
 model CitiTeam {
@@ -82,6 +84,7 @@ model CitiTeam {
   members   User[]     @relation("TeamMembers")
   Brokers Broker[] @relation("BrokersToCitiTeam")
   BrokerAudits BrokerAudit[] @relation("BrokerAuditsCitiTeam")
+  SSIs      SSI[]      @relation("SSIToCitiTeam")
 }
 
 model Bank {
@@ -140,6 +143,7 @@ model Broker {
   assignedTeam  Int
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  ssis         SSI[]         @relation("SSIToBroker")
   audits       BrokerAudit[]  @relation("BrokerAudits")
   citiTeam      CitiTeam       @relation("BrokersToCitiTeam", fields: [assignedTeam], references: [id])
   contactEmails ContactEmail[] @relation("EmailToBroker")
@@ -206,8 +210,52 @@ model ContactPhone {
   @@index([broker])
 }
 
+model SSI{
+  id        String   @id @default(cuid())
+  name      String
+  currency  String
+  field56Institution String?
+  field57Institution String
+  field57Account String
+  field58Institution String?
+  field58Account String?
+  furtherCreditTo String?
+  broker   Int
+  assignedTeam  Int
+  backup      String
+  assignedFile File @relation("FileToSSI",fields: [backup], references: [id])
+  citiTeam     CitiTeam       @relation("SSIToCitiTeam", fields: [assignedTeam], references: [id])
+  brokerId    Broker   @relation("SSIToBroker",fields: [broker], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  maker     String
+  checker   String?
+  callback String?
+  callbackId Callback? @relation("CallbackToSSI",fields: [callback], references: [id])
+  status    Status     @default(PENDING)
+  makerUser User       @relation("SSIMaker", fields: [maker], references: [id])
+  checkerUser User?    @relation("SSIChecker", fields: [checker], references: [id])
 
+  @@index([broker])
+  @@index([assignedTeam])
+  @@index([backup])
+  @@index([maker])
+  @@index([checker])
+  @@index([callback])
+}
 
+model File{
+    id        String   @id @default(cuid())
+    ssis      SSI[]    @relation("FileToSSI")
+    s3Id      String  @unique
+    name      String @unique
+    type      String
+}
+
+model Callback {
+  id String @id @default(cuid())
+  ssis SSI[] @relation("CallbackToSSI")
+}
 
 enum Role {
   USER

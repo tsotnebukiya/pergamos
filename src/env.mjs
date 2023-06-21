@@ -27,6 +27,9 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     MY_GITHUB_CLIENT_ID: z.string(),
     MY_GITHUB_CLIENT_SECRET: z.string(),
+    S3_ACCESS_KEY: z.string(),
+    S3_SECRET_KEY: z.string(),
+    S3_BUCKET_NAME: z.string(),
   },
 
   /**
@@ -53,5 +56,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     MY_GITHUB_CLIENT_ID: process.env.MY_GITHUB_CLIENT_ID,
     MY_GITHUB_CLIENT_SECRET: process.env.MY_GITHUB_CLIENT_SECRET,
+    S3_ACCESS_KEY: process.env.S3_ACCESS_KEY,
+    S3_SECRET_KEY: process.env.S3_SECRET_KEY,
+    S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
   },
 });

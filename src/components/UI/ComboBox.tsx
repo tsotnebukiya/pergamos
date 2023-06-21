@@ -16,7 +16,7 @@ import React from "react";
 export const ComboBox: React.FC<{
   fieldValue: string;
   onSelect: (value: string) => void;
-  array?: { value: string; label: string | JSX.Element }[];
+  array?: { value: string; label?: string | JSX.Element }[];
   name: string;
 }> = ({ fieldValue, array, onSelect, name }) => {
   const [open, setOpen] = React.useState(false);

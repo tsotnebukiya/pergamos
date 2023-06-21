@@ -65,6 +65,8 @@ Table User {
   checkedBankAudits BankAudit [not null]
   createdTeamsAudits BrokerAudit [not null]
   checkedTeamsAudits BrokerAudit [not null]
+  createdSSI SSI [not null]
+  checkedSSI SSI [not null]
 }
 
 Table CitiTeam {
@@ -73,6 +75,7 @@ Table CitiTeam {
   members User [not null]
   Brokers Broker [not null]
   BrokerAudits BrokerAudit [not null]
+  SSIs SSI [not null]
 }
 
 Table Bank {
@@ -120,6 +123,7 @@ Table Broker {
   assignedTeam Int [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  ssis SSI [not null]
   audits BrokerAudit [not null]
   citiTeam CitiTeam [not null]
   contactEmails ContactEmail [not null]
@@ -169,6 +173,46 @@ Table ContactPhone {
   brokerId Broker [not null]
 }
 
+Table SSI {
+  id String [pk]
+  name String [not null]
+  currency String [not null]
+  field56Institution String
+  field57Institution String [not null]
+  field57Account String [not null]
+  field58Institution String
+  field58Account String
+  furtherCreditTo String
+  broker Int [not null]
+  assignedTeam Int [not null]
+  backup String [not null]
+  assignedFile File [not null]
+  citiTeam CitiTeam [not null]
+  brokerId Broker [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  maker String [not null]
+  checker String
+  callback String
+  callbackId Callback
+  status Status [not null, default: 'PENDING']
+  makerUser User [not null]
+  checkerUser User
+}
+
+Table File {
+  id String [pk]
+  ssis SSI [not null]
+  s3Id String [unique, not null]
+  name String [unique, not null]
+  type String [not null]
+}
+
+Table Callback {
+  id String [pk]
+  ssis SSI [not null]
+}
+
 Enum Role {
   USER
   MODERATOR
@@ -216,3 +260,15 @@ Ref: BrokerAccounts.broker > Broker.id [delete: Cascade]
 Ref: ContactEmail.broker > Broker.id
 
 Ref: ContactPhone.broker > Broker.id
+
+Ref: SSI.backup > File.id
+
+Ref: SSI.assignedTeam > CitiTeam.id
+
+Ref: SSI.broker > Broker.id
+
+Ref: SSI.callback > Callback.id
+
+Ref: SSI.maker > User.id
+
+Ref: SSI.checker > User.id

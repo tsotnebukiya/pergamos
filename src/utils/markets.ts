@@ -149,3 +149,26 @@ export const markets = [
   "ZZ",
   "ICSD",
 ];
+
+export const currencies = [
+  { value: "usd", label: "USD" }, // United States Dollar
+  { value: "eur", label: "EUR" }, // Euro
+  { value: "jpy", label: "JPY" }, // Japanese Yen
+  { value: "gbp", label: "GBP" }, // British Pound Sterling
+  { value: "aud", label: "AUD" }, // Australian Dollar
+  { value: "cad", label: "CAD" }, // Canadian Dollar
+  { value: "chf", label: "CHF" }, // Swiss Franc
+  { value: "cny", label: "CNY" }, // Chinese Yuan
+  { value: "sek", label: "SEK" }, // Swedish Krona
+  { value: "nzd", label: "NZD" }, // New Zealand Dollar
+  { value: "mxn", label: "MXN" }, // Mexican Peso
+  { value: "sgd", label: "SGD" }, // Singapore Dollar
+  { value: "hkd", label: "HKD" }, // Hong Kong Dollar
+  { value: "nok", label: "NOK" }, // Norwegian Krone
+  { value: "krw", label: "KRW" }, // South Korean Won
+  { value: "try", label: "TRY" }, // Turkish Lira
+  { value: "rub", label: "RUB" }, // Russian Ruble
+  { value: "inr", label: "INR" }, // Indian Rupee
+  { value: "brl", label: "BRL" }, // Brazilian Real
+  { value: "zar", label: "ZAR" }, // South African Rand
+];

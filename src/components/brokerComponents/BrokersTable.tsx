@@ -10,7 +10,9 @@ import { type RouterOutputs } from "pergamos/utils/api";
 type Broker = RouterOutputs["brokers"]["getAll"][number];
 
 const columnHelper = createColumnHelper<Broker>();
-
+const handleCellClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  event.stopPropagation();
+};
 const columns = [
   columnHelper.accessor("name", {
     header: ({ column }) => (
@@ -89,7 +91,7 @@ const columns = [
       return (
         <div className="flex space-x-2">
           <Link href={`/dashboard/teams/${props.getValue().id}`}>
-            <Button variant="link">
+            <Button variant="link" onClick={handleCellClick}>
               <span className="max-w-[300px] truncate font-medium">
                 {props.getValue().name}
               </span>
@@ -111,7 +113,6 @@ const BrokersTable: React.FC<{
   const accounts = Array.from(
     new Set(data.flatMap((broker) => broker.accounts))
   ).map((value) => ({ value: value.account }));
-  console.log(accounts);
   const markets = Array.from(new Set(data.map((broker) => broker.market))).map(
     (value) => ({
       value: value,

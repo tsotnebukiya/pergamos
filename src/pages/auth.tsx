@@ -3,10 +3,11 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import AuthLayout from "pergamos/components/layouts/AuthLayout";
 import { getServerAuthSession } from "pergamos/server/auth";
+import { env } from "pergamos/env.mjs";
 
 const AuthPage: NextPage = () => {
   const router = useRouter();
-  console.log(router.query.error);
+
   const { status } = useSession();
   if (status === "authenticated") {
     void router.push("/dashboard");

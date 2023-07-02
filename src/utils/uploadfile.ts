@@ -15,7 +15,7 @@ export const config = {
   },
 };
 
-const getUploadPromise = async (name: string, type: string) => {
+export const getUploadPromise = async (name: string, type: string) => {
   try {
     const fileParams = {
       Bucket: process.env.S3_BUCKET_NAME,
@@ -31,4 +31,17 @@ const getUploadPromise = async (name: string, type: string) => {
   }
 };
 
-export default getUploadPromise;
+export const getDownloadPromise = async (name: string) => {
+  try {
+    const fileParams = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: name,
+      Expires: 600,
+    };
+    const url = await s3.getSignedUrlPromise("getObject", fileParams);
+    return url;
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+};

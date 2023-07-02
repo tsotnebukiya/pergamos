@@ -2,9 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
 
 datasource db {
   provider     = "mysql"
@@ -12,10 +9,40 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum PaymentAuditType {
+  CREATE
+  SENDAPPROVE
+  APPROVEDCHECKERI
+  APPROVEDCHECKERII
+  COMMENT
+  REJECT
+}
+
+enum PaymentStatus {
+  PENDING
+  CHECKERI
+  CHECKERII
+  REJECTED
+  APPROVED
+}
+
+enum PaymentPurpose {
+  CLAIM
+  LENDING
+  TAX
+  OTHER
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model Account {
@@ -76,6 +103,11 @@ model User {
   checkedTeamsAudits BrokerAudit[]@relation("BrokerAuditChecker")
   createdSSI    SSI[]      @relation("SSIMaker")
   checkedSSI    SSI[]      @relation("SSIChecker")
+  paymentsMaker Payment[] @relation("PaymentMaker")
+  paymentsCheckerI Payment[] @relation("PaymentCheckerI")
+  paymentsCheckerII Payment[] @relation("PaymentCheckerII")
+  paymentsComments PaymentComments[] @relation("PaymentCommentMaker")
+  paymentsAudit PaymentAudit[] @relation("PaymentAuditMaker")
 }
 
 model CitiTeam {
@@ -85,6 +117,7 @@ model CitiTeam {
   Brokers Broker[] @relation("BrokersToCitiTeam")
   BrokerAudits BrokerAudit[] @relation("BrokerAuditsCitiTeam")
   SSIs      SSI[]      @relation("SSIToCitiTeam")
+  Payments Payment[]  @relation("PaymentsToCitiTeam")
 }
 
 model Bank {
@@ -231,6 +264,7 @@ model SSI{
   maker     String
   checker   String?
   callback String?
+  payments Payment[]  @relation("PaymentsToSSI")
   callbackId Callback? @relation("CallbackToSSI",fields: [callback], references: [id])
   status    Status     @default(PENDING)
   makerUser User       @relation("SSIMaker", fields: [maker], references: [id])
@@ -257,14 +291,61 @@ model Callback {
   ssis SSI[] @relation("CallbackToSSI")
 }
 
-enum Role {
-  USER
-  MODERATOR
-  ADMIN
+model Payment {
+  id            Int            @id @default(autoincrement())
+  status        PaymentStatus  @default(PENDING)
+  amount        Float
+  amountUSD     Float?
+  purpose       PaymentPurpose
+  maker         String
+  checkerI      String?
+  checkerII     String?
+  assignedTeam  Int
+  assignedSsi   String
+  audit         PaymentAudit[] @relation("PaymentAudit")
+  comments      PaymentComments[] @relation("PaymentComments")
+  ssi           SSI            @relation("PaymentsToSSI", fields: [assignedSsi], references: [id])
+  citiTeam      CitiTeam       @relation("PaymentsToCitiTeam", fields: [assignedTeam], references: [id])
+  makerUser     User           @relation("PaymentMaker", fields: [maker], references: [id])
+  checkerUserI  User?          @relation("PaymentCheckerI", fields: [checkerI], references: [id])
+  checkerUserII User?          @relation("PaymentCheckerII", fields: [checkerII], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+
+  @@index([assignedTeam])
+  @@index([assignedSsi])
+  @@index([maker])
+  @@index([checkerI])
+  @@index([checkerII])
 }
 
-enum Status {
-  PENDING
-  APPROVED
-  REJECTED
+model PaymentComments {
+  id        String   @id @default(cuid())
+  maker     String
+  payment   Int
+  audit     String @unique
+  auditId   PaymentAudit @relation("PaymentAuditComment",fields: [audit], references: [id])
+  paymentId Payment @relation("PaymentComments", fields: [payment], references: [id])
+  makerUser User     @relation("PaymentCommentMaker", fields: [maker], references: [id])
+
+
+  @@index([maker])
+  @@index([payment])
+  @@index([id])
+}
+
+model PaymentAudit {
+  id        String   @id @default(cuid())
+  payment   Int
+  type      PaymentAuditType @default(CREATE)
+  maker     String
+  comment   String? @unique
+  paymentId Payment @relation("PaymentAudit", fields: [payment], references: [id])
+  commentId PaymentComments? @relation("PaymentAuditComment")
+  makerUser User     @relation("PaymentAuditMaker", fields: [maker], references: [id])
+  timestamp DateTime @default(now())
+
+  @@index([maker])
+  @@index([payment])
 }

@@ -28,6 +28,20 @@ export function Sidebar({ className }: SidebarProps) {
                   Home
                 </Button>
               </Link>
+              <Link href="/dashboard/payments">
+                <Button
+                  variant={
+                    currentPath === "/dashboard/payments"
+                      ? "secondary"
+                      : "ghost"
+                  }
+                  size="lg"
+                  className="w-full justify-start"
+                >
+                  <UsersIcon className="mr-2 h-5 w-5" />
+                  Payments
+                </Button>
+              </Link>
               <Link href="/dashboard/banks">
                 <Button
                   variant={
@@ -50,6 +64,18 @@ export function Sidebar({ className }: SidebarProps) {
                 >
                   <UsersIcon className="mr-2 h-5 w-5" />
                   Brokers
+                </Button>
+              </Link>
+              <Link href="/dashboard/ssi">
+                <Button
+                  variant={
+                    currentPath === "/dashboard/ssi" ? "secondary" : "ghost"
+                  }
+                  size="lg"
+                  className="w-full justify-start"
+                >
+                  <UsersIcon className="mr-2 h-5 w-5" />
+                  SSI
                 </Button>
               </Link>
             </div>

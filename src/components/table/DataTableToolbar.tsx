@@ -15,14 +15,14 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   filters?: FilterOption[];
   actions?: React.ReactNode;
-  view:boolean
+  view: boolean;
 }
 
 export function DataTableToolbar<TData>({
   table,
   filters = [],
   actions,
-  view
+  view,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getPreFilteredRowModel().rows.length >
@@ -32,7 +32,7 @@ export function DataTableToolbar<TData>({
     <div className="items-top flex justify-between">
       <div className="flex flex-col justify-start gap-2 toolbarLG:flex-row toolbarLG:items-center">
         <Input
-          placeholder="Filter tasks..."
+          placeholder="Filter items..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
@@ -68,6 +68,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex flex-col gap-2 space-x-2 1250:flex-row">
         {actions}
+
         {view && <DataTableViewOptions table={table} />}
       </div>
     </div>

@@ -5,31 +5,31 @@ import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import { api } from "pergamos/utils/api";
 import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
-import SSITable from "pergamos/components/ssiComponents/ssiTable";
+import BrokersTable from "pergamos/components/brokerComponents/BrokersTable";
+import BrokerCreate from "pergamos/components/brokerComponents/BrokerCreate";
 
-const SSIListPage: NextPageWithLayout = () => {
-  const { data } = api.ssi.getAll.useQuery();
+const BrokersPage: NextPageWithLayout = () => {
+  const [open, setOpen] = useState(false);
+  const { data } = api.brokers.getAll.useQuery();
   if (!data) return null;
   return (
     <main>
-      <BreadCrumbs pages={[{ name: "SSIs", href: "/dashboard/ssi" }]} />
-      <div className="container mx-auto py-6">
-        <SSITable data={data} />
-      </div>
+      <BreadCrumbs pages={[{ name: "Brokers", href: "/dashboard/brokers" }]} />
+      <div className="container mx-auto py-6">Payments</div>
     </main>
   );
 };
 
-SSIListPage.getLayout = function getLayout(page: ReactElement) {
+BrokersPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
 };
 
-export default SSIListPage;
+export default BrokersPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const helper = await createHelpers(context);
 
-  await helper.ssi.getAll.prefetch();
+  await helper.brokers.getAll.prefetch();
 
   return {
     props: {

@@ -4,97 +4,76 @@ import { createTRPCRouter, protectedProcedure } from "pergamos/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 
 const schema = z.object({
-  bankId: z.number().min(1, "Bank is required"),
-  name: z.string().min(3, "Name must be at least 3 characters long"),
-  market: z.string().nonempty("Market is required"),
-  assignedTeam: z.number().min(1, "Team is required"),
-  accounts: z.array(
-    z.string().refine((value) => {
-      const numValue = Number(value);
-      return !isNaN(numValue) && numValue > 0 && Number.isInteger(numValue);
-    }, "Account must be a number")
-  ),
+  assignedBroker: z.number(),
+  assignedTeam: z.number(),
+  assignedSsi: z.string(),
+  purpose: z.string(),
+  amount: z.number(),
+  relatedTrade: z.string().optional(),
+  appNotification: z.boolean(),
+  emailNotification: z.boolean(),
+  valueDate: z.date(),
+  receiverInformation: z.string(),
 });
 
-export const brokersRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(schema)
-    // eslint-disable-next-line @typescript-eslint/require-await
-    .mutation(async ({ ctx, input }) => {
-      const bank = await ctx.prisma.bank.findUniqueOrThrow({
-        where: {
-          id: input.bankId,
-        },
-      });
-      if (!bank.active) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Bank is not active",
-        });
-      }
-      const broker = await ctx.prisma.broker.create({
-        data: {
-          name: input.name,
-          market: input.market,
-          citiTeam: {
-            connect: {
-              id: input.assignedTeam,
-            },
-          },
-          makerUser: {
-            connect: {
-              id: ctx.session.user.id,
-            },
-          },
-          bankId: {
-            connect: {
-              id: input.bankId,
-            },
+export const paymentsRouter = createTRPCRouter({
+  create: protectedProcedure.input(schema).mutation(async ({ ctx, input }) => {
+    const payment = await ctx.prisma.payment.create({
+      data: {
+        amount: input.amount,
+        valueDate: input.valueDate,
+        receiverInformation: input.receiverInformation,
+        relatedTrade: input.relatedTrade !== "" ? input.relatedTrade : null,
+        appNotification: input.appNotification,
+        emailNotification: input.emailNotification,
+        broker: {
+          connect: {
+            id: input.assignedBroker,
           },
         },
-      });
-      if (broker) {
-        await ctx.prisma.brokerAccounts.createMany({
-          data: input.accounts.map((acc) => {
-            return {
-              account: acc,
-              broker: broker.id,
-            };
-          }),
-        });
-      }
-      return broker;
-    }),
+        purpose: input.purpose,
+        ssi: {
+          connect: {
+            id: input.assignedSsi,
+          },
+        },
+        citiTeam: {
+          connect: {
+            id: input.assignedTeam,
+          },
+        },
+        makerUser: {
+          connect: {
+            id: ctx.session.user.id,
+          },
+        },
+      },
+    });
+    const audit = await ctx.prisma.paymentAudit.create({
+      data: {
+        paymentId: {
+          connect: {
+            id: payment.id,
+          },
+        },
+        makerUser: {
+          connect: {
+            id: ctx.session.user.id,
+          },
+        },
+        type: "CREATE",
+      },
+    });
+    return payment;
+  }),
   getOne: protectedProcedure
-    .input(z.object({ id: z.number(), ssi: z.boolean().optional() }))
+    .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       const broker = await ctx.prisma.broker.findUniqueOrThrow({
         where: {
           id: input.id,
         },
         select: {
-          ...(input.ssi
-            ? {
-                ssis: {
-                  select: {
-                    currency: true,
-                    status: true,
-                    name: true,
-                    id: true,
-                    field56Institution: true,
-                    field57Account: true,
-                    field57Institution: true,
-                    field58Account: true,
-                    field58Institution: true,
-                    furtherCreditTo: true,
-                  },
-                  where: {
-                    status: "APPROVED",
-                  },
-                },
-              }
-            : {}),
-
           id: true,
           name: true,
           active: true,

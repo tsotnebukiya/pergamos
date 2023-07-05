@@ -11,6 +11,7 @@ import BrokerCreate from "pergamos/components/brokerComponents/BrokerCreate";
 const BrokersPage: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false);
   const { data } = api.brokers.getAll.useQuery();
+
   if (!data) return null;
   return (
     <main>

@@ -1,19 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import {
-  type ReactElement,
-  EventHandler,
-  ChangeEventHandler,
-  ChangeEvent,
-  useState,
-} from "react";
+import { type ReactElement, type ChangeEvent, useState } from "react";
 import type { NextPageWithLayout } from "pergamos/utils/types";
 import DashboardLayout from "pergamos/components/layouts/DashboardLayout";
 import BreadCrumbs from "pergamos/components/Breadcrumbs";
 import { api } from "pergamos/utils/api";
-import type { GetServerSideProps } from "next";
-import { createHelpers } from "pergamos/utils/helpers";
-import BrokersTable from "pergamos/components/brokerComponents/BrokersTable";
-import BrokerCreate from "pergamos/components/brokerComponents/BrokerCreate";
 import {
   Card,
   CardContent,
@@ -35,13 +25,10 @@ import {
 import { ComboBox } from "pergamos/components/UI/ComboBox";
 import { Button } from "pergamos/components/UI/Button";
 import { Input } from "pergamos/components/UI/Input";
-import { Label } from "pergamos/components/UI/Label";
 import { toast } from "pergamos/hooks/useToast";
 import { currencies } from "pergamos/utils/markets";
 import { useRouter } from "next/router";
-interface UploadData {
-  url: string;
-}
+
 const uploadfile = async (url: string, file: File) => {
   try {
     const res = await axios.put(url, file, {

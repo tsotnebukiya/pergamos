@@ -17,7 +17,6 @@ enum Role {
 
 enum PaymentAuditType {
   CREATE
-  SENDAPPROVE
   APPROVEDCHECKERI
   APPROVEDCHECKERII
   COMMENT
@@ -32,12 +31,7 @@ enum PaymentStatus {
   APPROVED
 }
 
-enum PaymentPurpose {
-  CLAIM
-  LENDING
-  TAX
-  OTHER
-}
+
 
 enum Status {
   PENDING
@@ -176,6 +170,7 @@ model Broker {
   assignedTeam  Int
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  payments      Payment[]      @relation("PaymentsToBroker")
   ssis         SSI[]         @relation("SSIToBroker")
   audits       BrokerAudit[]  @relation("BrokerAudits")
   citiTeam      CitiTeam       @relation("BrokersToCitiTeam", fields: [assignedTeam], references: [id])
@@ -296,14 +291,21 @@ model Payment {
   status        PaymentStatus  @default(PENDING)
   amount        Float
   amountUSD     Float?
-  purpose       PaymentPurpose
+  purpose       String
   maker         String
   checkerI      String?
   checkerII     String?
+  valueDate     DateTime
+  receiverInformation String
   assignedTeam  Int
+  assignedBroker Int
   assignedSsi   String
+  relatedTrade  String?
+  appNotification  Boolean        @default(false)
+  emailNotification  Boolean        @default(false)
   audit         PaymentAudit[] @relation("PaymentAudit")
   comments      PaymentComments[] @relation("PaymentComments")
+  broker        Broker         @relation("PaymentsToBroker", fields: [assignedBroker], references: [id])
   ssi           SSI            @relation("PaymentsToSSI", fields: [assignedSsi], references: [id])
   citiTeam      CitiTeam       @relation("PaymentsToCitiTeam", fields: [assignedTeam], references: [id])
   makerUser     User           @relation("PaymentMaker", fields: [maker], references: [id])
@@ -318,11 +320,13 @@ model Payment {
   @@index([maker])
   @@index([checkerI])
   @@index([checkerII])
+  @@index([assignedBroker])
 }
 
 model PaymentComments {
   id        String   @id @default(cuid())
   maker     String
+  comment   String @db.Text
   payment   Int
   audit     String @unique
   auditId   PaymentAudit @relation("PaymentAuditComment",fields: [audit], references: [id])

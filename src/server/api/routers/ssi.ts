@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { number, z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "pergamos/server/api/trpc";
 import { TRPCError } from "@trpc/server";
@@ -149,6 +149,7 @@ export const ssiRouter = createTRPCRouter({
       });
       return ssi;
     }),
+
   activate: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -192,52 +193,61 @@ export const ssiRouter = createTRPCRouter({
       const url = (await getDownloadPromise(file.name)) as string;
       return { url, filename: file.name };
     }),
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    const ssi = await ctx.prisma.sSI.findMany({
-      select: {
-        id: true,
-        status: true,
-        name: true,
-        checkerUser: {
-          select: {
-            name: true,
-            id: true,
-          },
+  getAll: protectedProcedure
+    .input(z.object({ brokerId: number().optional() }))
+    .query(async ({ ctx, input }) => {
+      let whereCondition = {}; // Empty object for the where condition
+      if (input.brokerId !== undefined) {
+        whereCondition = { brokerId: input.brokerId };
+      }
+      const ssi = await ctx.prisma.sSI.findMany({
+        where: {
+          brokerId: whereCondition,
         },
-        makerUser: {
-          select: {
-            name: true,
-            id: true,
+        select: {
+          id: true,
+          status: true,
+          name: true,
+          checkerUser: {
+            select: {
+              name: true,
+              id: true,
+            },
           },
-        },
-        citiTeam: {
-          select: {
-            name: true,
-            id: true,
+          makerUser: {
+            select: {
+              name: true,
+              id: true,
+            },
           },
-        },
-        brokerId: {
-          select: {
-            name: true,
-            id: true,
-            bank: true,
+          citiTeam: {
+            select: {
+              name: true,
+              id: true,
+            },
           },
-        },
-        assignedFile: {
-          select: {
-            name: true,
-            s3Id: true,
+          brokerId: {
+            select: {
+              name: true,
+              id: true,
+              bank: true,
+            },
           },
+          assignedFile: {
+            select: {
+              name: true,
+              s3Id: true,
+            },
+          },
+          currency: true,
+          field56Institution: true,
+          field57Account: true,
+          field57Institution: true,
+          field58Account: true,
+          field58Institution: true,
+          furtherCreditTo: true,
         },
-        currency: true,
-        field56Institution: true,
-        field57Account: true,
-        field57Institution: true,
-        field58Account: true,
-        field58Institution: true,
-        furtherCreditTo: true,
-      },
-    });
-    return ssi;
-  }),
+      });
+      return ssi;
+    }),
 });

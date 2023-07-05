@@ -3,6 +3,7 @@ import { banksRouter } from "pergamos/server/api/routers/banks";
 import { brokersRouter } from "./routers/brokers";
 import { teamsRouter } from "./routers/teams";
 import { ssiRouter } from "./routers/ssi";
+import { paymentsRouter } from "./routers/payments";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   brokers: brokersRouter,
   teams: teamsRouter,
   ssi: ssiRouter,
+  payments: paymentsRouter,
 });
 
 // export type definition of API

@@ -8,7 +8,7 @@ import { createHelpers } from "pergamos/utils/helpers";
 import SSITable from "pergamos/components/ssiComponents/ssiTable";
 
 const SSIListPage: NextPageWithLayout = () => {
-  const { data } = api.ssi.getAll.useQuery();
+  const { data } = api.ssi.getAll.useQuery({});
   if (!data) return null;
   return (
     <main>
@@ -29,7 +29,7 @@ export default SSIListPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const helper = await createHelpers(context);
 
-  await helper.ssi.getAll.prefetch();
+  await helper.ssi.getAll.prefetch({});
 
   return {
     props: {

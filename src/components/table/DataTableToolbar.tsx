@@ -16,6 +16,7 @@ interface DataTableToolbarProps<TData> {
   filters?: FilterOption[];
   actions?: React.ReactNode;
   view: boolean;
+  id?: boolean;
 }
 
 export function DataTableToolbar<TData>({
@@ -23,6 +24,7 @@ export function DataTableToolbar<TData>({
   filters = [],
   actions,
   view,
+  id,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getPreFilteredRowModel().rows.length >
@@ -30,13 +32,19 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="items-top flex justify-between">
-      <div className="flex flex-col justify-start gap-2 toolbarLG:flex-row toolbarLG:items-center">
+      <div className=" flex justify-start gap-2">
         <Input
           placeholder="Filter items..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+          value={
+            (table
+              .getColumn(`${id ? "id" : "name"}`)
+              ?.getFilterValue() as string) ?? ""
           }
+          onChange={(event) => {
+            table
+              .getColumn(id ? "id" : "name")
+              ?.setFilterValue(event.target.value);
+          }}
           className="h-8 w-[150px] lg:w-[250px]"
         />
         <div className="flex justify-between gap-2">
@@ -66,7 +74,7 @@ export function DataTableToolbar<TData>({
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-2 space-x-2 1250:flex-row">
+      <div className="1250:flex-row flex flex-col gap-2 space-x-2">
         {actions}
 
         {view && <DataTableViewOptions table={table} />}

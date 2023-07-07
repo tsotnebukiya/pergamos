@@ -28,7 +28,7 @@ const SSIDetails: React.FC<{
             <div className="flex justify-between">
               <span>Broker</span>
               <Link
-                href={`/dashboard/banks/${ssi.brokerId.id}`}
+                href={`/dashboard/banks/${ssi.brokerId.bank}/brokers/${ssi.brokerId.id}`}
                 className="items-start"
               >
                 <Button variant="link" className="h-0 items-start p-0">
@@ -39,7 +39,7 @@ const SSIDetails: React.FC<{
 
             <div className="flex justify-between">
               <span>Associated Team</span>
-              <Link href={`/dashboard/users/${ssi.citiTeam.id}`}>
+              <Link href={`/dashboard/teams/${ssi.citiTeam.id}`}>
                 <Button variant="link" className="h-10 items-start p-0">
                   {ssi.citiTeam.name}
                 </Button>

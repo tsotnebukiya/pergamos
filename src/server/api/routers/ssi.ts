@@ -130,6 +130,7 @@ export const ssiRouter = createTRPCRouter({
             select: {
               name: true,
               id: true,
+              bank: true,
             },
           },
           assignedFile: {

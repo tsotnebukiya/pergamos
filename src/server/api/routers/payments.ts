@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "pergamos/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { exchangeRate } from "pergamos/utils/rate";
 
 const schema = z.object({
   assignedBroker: z.number(),
@@ -18,9 +19,22 @@ const schema = z.object({
 
 export const paymentsRouter = createTRPCRouter({
   create: protectedProcedure.input(schema).mutation(async ({ ctx, input }) => {
+    const ssi = await ctx.prisma.sSI.findUniqueOrThrow({
+      where: {
+        id: input.assignedSsi,
+      },
+      select: {
+        currency: true,
+      },
+    });
+    let usdAmount: number = input.amount;
+    if (ssi.currency !== "usd") {
+      usdAmount = await exchangeRate(input.amount, ssi.currency);
+    }
     const payment = await ctx.prisma.payment.create({
       data: {
         amount: input.amount,
+        amountUSD: usdAmount,
         valueDate: input.valueDate,
         receiverInformation: input.receiverInformation,
         relatedTrade: input.relatedTrade !== "" ? input.relatedTrade : null,
@@ -49,7 +63,7 @@ export const paymentsRouter = createTRPCRouter({
         },
       },
     });
-    const audit = await ctx.prisma.paymentAudit.create({
+    await ctx.prisma.paymentAudit.create({
       data: {
         paymentId: {
           connect: {
@@ -137,25 +151,32 @@ export const paymentsRouter = createTRPCRouter({
       return broker;
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    const broker = await ctx.prisma.broker.findMany({
+    const payment = await ctx.prisma.payment.findMany({
       orderBy: {
         createdAt: "desc",
       },
-      select: {
-        id: true,
-        bank: true,
-        name: true,
-        active: true,
-        market: true,
-        citiTeam: true,
-        accounts: {
+      include: {
+        ssi: {
           select: {
-            account: true,
+            currency: true,
+          },
+        },
+        citiTeam: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        broker: {
+          select: {
+            name: true,
+            id: true,
+            bank: true,
           },
         },
       },
     });
-    return broker;
+    return payment;
   }),
   activate: protectedProcedure
     .input(z.object({ id: z.number() }))

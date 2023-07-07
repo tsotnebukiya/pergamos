@@ -101,32 +101,23 @@ const NewPaymentPage: NextPageWithLayout = () => {
     },
   });
 
-  const disabled01 =
-    !!form.watch("assignedTeam") &&
-    !!form.watch("assignedBroker") &&
-    !!form.watch("purpose");
-  const disabled02 =
-    !!form.watch("assignedSsi") &&
-    !!form.watch("amount") &&
-    !!form.watch("valueDate") &&
-    !!form.watch("receiverInformation");
   const { mutate } = api.payments.create.useMutation({
     onSuccess: async (data) => {
-      setSubmitting(false);
       await router.push(`/dashboard/payments/${data.id}`);
       toast({
         variant: "default",
         title: "Success",
         description: "Payment created successfully",
       });
+      setSubmitting(false);
     },
     onError: (error) => {
-      setSubmitting(false);
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message,
       });
+      setSubmitting(false);
     },
   });
   const { data: teamsData } = api.teams.getAll.useQuery();
@@ -160,6 +151,16 @@ const NewPaymentPage: NextPageWithLayout = () => {
     value: el.id,
     label: el.name,
   }));
+  const enabled01 =
+    !!form.watch("assignedTeam") &&
+    !!form.watch("assignedBroker") &&
+    !!form.watch("purpose") &&
+    !!brokerData;
+  const enabled02 =
+    !!form.watch("assignedSsi") &&
+    !!form.watch("amount") &&
+    !!form.watch("valueDate") &&
+    !!form.watch("receiverInformation");
   const goNextToSecondStep = () => {
     setStepState({
       step01: "complete",
@@ -173,7 +174,6 @@ const NewPaymentPage: NextPageWithLayout = () => {
     });
   };
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
-    console.log(data.amount);
     setSubmitting(true);
     mutate({
       ...data,
@@ -366,7 +366,7 @@ const NewPaymentPage: NextPageWithLayout = () => {
                     <Button
                       type="button"
                       className="ml-auto"
-                      disabled={!disabled01}
+                      disabled={!enabled01}
                       onClick={() => {
                         goNextToSecondStep();
                       }}
@@ -569,9 +569,9 @@ const NewPaymentPage: NextPageWithLayout = () => {
                     <Button
                       type="submit"
                       className="ml-auto"
-                      disabled={submitting || !disabled02}
+                      disabled={submitting || !enabled02 || !ssiData}
                     >
-                      Submit
+                      {submitting ? <>Submitting...</> : <>Submit</>}
                     </Button>
                   </div>
                 </div>

@@ -39,6 +39,7 @@ interface DataTableProps<TData extends { id: string | number }, TValue> {
   filters?: FilterOption[];
   actions?: React.ReactNode;
   view: boolean;
+  id?: boolean;
 }
 
 export function DataTable<
@@ -54,6 +55,7 @@ export function DataTable<
   broker,
   link,
   view,
+  id,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const [rowSelection, setRowSelection] = React.useState({});
@@ -96,6 +98,7 @@ export function DataTable<
         view={view}
         table={table}
         actions={actions}
+        id={id}
         {...(filters.length > 0 && { filters })}
       />
       <div className="rounded-md border">

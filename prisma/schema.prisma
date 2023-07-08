@@ -20,7 +20,6 @@ enum PaymentAuditType {
   SENDFORAPPROVAL
   APPROVEDCHECKERI
   APPROVEDCHECKERII
-  COMMENT
   REJECT
 }
 
@@ -99,7 +98,6 @@ model User {
   paymentsMaker Payment[] @relation("PaymentMaker")
   paymentsCheckerI Payment[] @relation("PaymentCheckerI")
   paymentsCheckerII Payment[] @relation("PaymentCheckerII")
-  paymentsComments PaymentComments[] @relation("PaymentCommentMaker")
   paymentsAudit PaymentAudit[] @relation("PaymentAuditMaker")
 }
 
@@ -303,7 +301,6 @@ model Payment {
   appNotification  Boolean        @default(false)
   emailNotification  Boolean        @default(false)
   audit         PaymentAudit[] @relation("PaymentAudit")
-  comments      PaymentComments[] @relation("PaymentComments")
   broker        Broker         @relation("PaymentsToBroker", fields: [assignedBroker], references: [id])
   ssi           SSI            @relation("PaymentsToSSI", fields: [assignedSsi], references: [id])
   citiTeam      CitiTeam       @relation("PaymentsToCitiTeam", fields: [assignedTeam], references: [id])
@@ -322,30 +319,14 @@ model Payment {
   @@index([assignedBroker])
 }
 
-model PaymentComments {
-  id        String   @id @default(cuid())
-  maker     String
-  comment   String @db.Text
-  payment   Int
-  audit     String @unique
-  auditId   PaymentAudit @relation("PaymentAuditComment",fields: [audit], references: [id])
-  paymentId Payment @relation("PaymentComments", fields: [payment], references: [id])
-  makerUser User     @relation("PaymentCommentMaker", fields: [maker], references: [id])
 
-
-  @@index([maker])
-  @@index([payment])
-  @@index([id])
-}
 
 model PaymentAudit {
   id        String   @id @default(cuid())
   payment   Int
   type      PaymentAuditType @default(CREATE)
   maker     String
-  comment   String? @unique
   paymentId Payment @relation("PaymentAudit", fields: [payment], references: [id])
-  commentId PaymentComments? @relation("PaymentAuditComment")
   makerUser User     @relation("PaymentAuditMaker", fields: [maker], references: [id])
   timestamp DateTime @default(now())
 

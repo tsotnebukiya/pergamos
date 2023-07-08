@@ -83,46 +83,16 @@ const PaymentDetails: React.FC<{
           </div>
         </CardContent>
       </Card>
-      <Card className={`${cardClass2 || ""} border-0`}>
-        <PaymentAudit data={data} />
-        {/* <CardHeader>
-          <CardTitle>SSI Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between">
-              <span>Status</span>
-              <Badge
-                variant={ssi.status === "APPROVED" ? "outline" : "secondary"}
-              >
-                {ssi.status === "APPROVED" ? "Approved" : "Pending"}
-              </Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Created By</span>
-              <Link
-                href={`dashboard/users/${ssi.makerUser.id}`}
-                className="items-start"
-              >
-                <Button variant="link" className="h-0 items-start p-0">
-                  {ssi.makerUser.name}
-                </Button>
-              </Link>
-            </div>
-            {ssi.checkerUser?.id && ssi.checkerUser.name && (
-              <div className="flex justify-between">
-                <span>Approved By</span>
-
-                <Link href={`dashboard/users/${ssi.checkerUser.id}`}>
-                  <Button variant="link" className="h-10 items-start p-0">
-                    {ssi.checkerUser.name}
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-        </CardContent> */}
-      </Card>
+      <div className={cardClass2}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Audit Trail</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PaymentAudit data={data} />
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 };

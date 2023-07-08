@@ -83,66 +83,56 @@ export const paymentsRouter = createTRPCRouter({
   getOne: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
-      const broker = await ctx.prisma.broker.findUniqueOrThrow({
+      const broker = await ctx.prisma.payment.findUniqueOrThrow({
         where: {
           id: input.id,
         },
-        select: {
-          id: true,
-          name: true,
-          active: true,
-          market: true,
-          amending: true,
-          citiTeam: {
-            select: {
-              id: true,
-              name: true,
+        include: {
+          ssi: {
+            include: {
+              assignedFile: true,
             },
           },
-          audits: {
-            orderBy: {
-              createdAt: "desc",
-            },
-            take: 1,
+          audit: {
             include: {
-              citiTeam: {
+              makerUser: {
                 select: {
                   name: true,
+                  id: true,
+                  image: true,
                 },
               },
             },
-
-            where: {
-              status: "PENDING",
+          },
+          broker: {
+            select: {
+              name: true,
+              market: true,
+              id: true,
+              bank: true,
             },
           },
-          bankId: {
+          checkerUserI: {
             select: {
               name: true,
               id: true,
             },
           },
           makerUser: {
-            select: { id: true, name: true },
-          },
-          checkerUser: {
-            select: { id: true, name: true },
-          },
-          contactEmails: {
             select: {
-              email: true,
+              id: true,
+              name: true,
+            },
+          },
+          checkerUserII: {
+            select: {
+              name: true,
               id: true,
             },
           },
-          accounts: {
+          citiTeam: {
             select: {
-              account: true,
-              id: true,
-            },
-          },
-          contactPhones: {
-            select: {
-              phone: true,
+              name: true,
               id: true,
             },
           },

@@ -17,6 +17,7 @@ enum Role {
 
 enum PaymentAuditType {
   CREATE
+  SENDFORAPPROVAL
   APPROVEDCHECKERI
   APPROVEDCHECKERII
   COMMENT
@@ -30,8 +31,6 @@ enum PaymentStatus {
   REJECTED
   APPROVED
 }
-
-
 
 enum Status {
   PENDING

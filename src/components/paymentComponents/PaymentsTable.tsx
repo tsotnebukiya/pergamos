@@ -15,6 +15,7 @@ import {
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 import { CSVLink, CSVDownload } from "react-csv";
+import { Badge } from "../UI/Badge";
 
 type Icon = React.ForwardRefExoticComponent<
   IconProps & React.RefAttributes<SVGSVGElement>
@@ -173,7 +174,7 @@ const columns = [
     cell: (props) => {
       return (
         <span className="max-w-[300px] truncate">
-          {props.getValue().toUpperCase()}
+          <Badge variant="secondary">{props.getValue().toUpperCase()}</Badge>
         </span>
       );
     },

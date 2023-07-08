@@ -30,7 +30,6 @@ export const env = createEnv({
     S3_ACCESS_KEY: z.string(),
     S3_SECRET_KEY: z.string(),
     S3_BUCKET_NAME: z.string(),
-    FX_API_KEY: z.string(),
   },
 
   /**
@@ -60,6 +59,5 @@ export const env = createEnv({
     S3_ACCESS_KEY: process.env.S3_ACCESS_KEY,
     S3_SECRET_KEY: process.env.S3_SECRET_KEY,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
-    FX_API_KEY: process.env.FX_API_KEY,
   },
 });

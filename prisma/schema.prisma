@@ -25,10 +25,10 @@ enum PaymentAuditType {
 
 enum PaymentStatus {
   PENDING
-  CHECKERI
-  CHECKERII
-  REJECTED
+  SENTFORAPPROVAL
+  SENFOROVTAPPROVAL
   APPROVED
+  REJECTED
 }
 
 enum Status {

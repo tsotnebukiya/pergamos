@@ -19,7 +19,7 @@ import BrokerAmendApprove from "pergamos/components/brokerComponents/BrokerAmend
 
 const BrokerOverviewPage: NextPageWithLayout = () => {
   const query = useRouter().query.brokerId;
-  const { data } = api.brokers.getOne.useQuery({ id: Number(query) });
+  const { data, error } = api.brokers.getOne.useQuery({ id: Number(query) });
   const [activateOpen, setActivateOpen] = useState(false);
   const [amendOpen, setAmendOpen] = useState(false);
   const [approveOpen, setApproveOpen] = useState(false);
@@ -110,7 +110,6 @@ export default BrokerOverviewPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const helper = await createHelpers(context);
   const id = context.params?.brokerId;
-  console.log(id, Number(id));
   if (typeof id !== "string") throw new Error("Invalid bank id");
   try {
     await helper.brokers.getOne.fetch({ id: Number(id) });

@@ -9,7 +9,7 @@ type SSI = RouterOutputs["ssi"]["getAll"][number];
 
 const columnHelper = createColumnHelper<SSI>();
 
-const handleCellClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+const handleCellClick = (event: React.MouseEvent) => {
   event.stopPropagation();
 };
 const columns = [
@@ -97,8 +97,9 @@ const columns = [
             href={`/dashboard/banks/${props.getValue().bank}/brokers/${
               props.getValue().id
             }`}
+            onClick={handleCellClick}
           >
-            <Button variant="link" onClick={handleCellClick}>
+            <Button variant="link" >
               <span className="max-w-[300px] truncate font-medium">
                 {props.getValue().name}
               </span>
@@ -117,8 +118,8 @@ const columns = [
     cell: (props) => {
       return (
         <div className="flex space-x-2">
-          <Link href={`/dashboard/teams/${props.getValue().id}`}>
-            <Button variant="link" onClick={handleCellClick}>
+          <Link href={`/dashboard/teams/${props.getValue().id}`} onClick={handleCellClick}>
+            <Button variant="link">
               <span className="max-w-[300px] truncate font-medium">
                 {props.getValue().name}
               </span>

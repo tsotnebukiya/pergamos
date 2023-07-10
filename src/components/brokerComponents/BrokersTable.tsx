@@ -10,7 +10,7 @@ import { type RouterOutputs } from "pergamos/utils/api";
 type Broker = RouterOutputs["brokers"]["getAll"][number];
 
 const columnHelper = createColumnHelper<Broker>();
-const handleCellClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+const handleCellClick = (event: React.MouseEvent) => {
   event.stopPropagation();
 };
 const columns = [
@@ -90,8 +90,11 @@ const columns = [
     cell: (props) => {
       return (
         <div className="flex space-x-2">
-          <Link href={`/dashboard/teams/${props.getValue().id}`}>
-            <Button variant="link" onClick={handleCellClick}>
+          <Link
+            href={`/dashboard/teams/${props.getValue().id}`}
+            onClick={handleCellClick}
+          >
+            <Button variant="link">
               <span className="max-w-[300px] truncate font-medium">
                 {props.getValue().name}
               </span>

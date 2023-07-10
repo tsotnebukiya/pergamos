@@ -25,7 +25,7 @@ type Payment = RouterOutputs["payments"]["getAll"][number];
 
 const columnHelper = createColumnHelper<Payment>();
 
-const handleCellClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+const handleCellClick = (event: React.MouseEvent) => {
   event.stopPropagation();
 };
 
@@ -264,8 +264,9 @@ const columns = [
             href={`/dashboard/banks/${props.getValue().bank}/brokers/${
               props.getValue().id
             }`}
+            onClick={handleCellClick}
           >
-            <Button variant="link" onClick={handleCellClick}>
+            <Button variant="link">
               <span className="max-w-[300px] truncate">
                 {props.getValue().name}
               </span>
@@ -284,8 +285,11 @@ const columns = [
     cell: (props) => {
       return (
         <div className="flex space-x-2">
-          <Link href={`/dashboard/teams/${props.getValue().id}`}>
-            <Button variant="link" onClick={handleCellClick}>
+          <Link
+            href={`/dashboard/teams/${props.getValue().id}`}
+            onClick={handleCellClick}
+          >
+            <Button variant="link">
               <span className="max-w-[300px] truncate">
                 {props.getValue().name}
               </span>
@@ -322,42 +326,44 @@ const PaymentsTable: React.FC<{
     };
   });
   return (
-    <DataTable
-      view={false}
-      columns={columns}
-      data={data}
-      selecting={false}
-      link={`/dashboard/payments`}
-      id={true}
-      filters={[
-        {
-          columnName: "ssi",
-          title: "Currency",
-          options: [...accounts],
-        },
-        {
-          columnName: "status",
-          title: "Status",
-          options: [...statuses],
-        },
-        {
-          columnName: "amountUSD",
-          title: "Volume",
-          options: [...volumes],
-        },
-      ]}
-      actions={
-        <div className="flex gap-2">
-          <Button className="h-8" variant="outline">
-            <CSVLink data={exportData}>Export to CSV</CSVLink>
-          </Button>
+    <>
+      <DataTable
+        view={false}
+        columns={columns}
+        data={data}
+        selecting={false}
+        link={`/dashboard/payments`}
+        id={true}
+        filters={[
+          {
+            columnName: "ssi",
+            title: "Currency",
+            options: [...accounts],
+          },
+          {
+            columnName: "status",
+            title: "Status",
+            options: [...statuses],
+          },
+          {
+            columnName: "amountUSD",
+            title: "Volume",
+            options: [...volumes],
+          },
+        ]}
+        actions={
+          <div className="flex gap-2">
+            <Button className="h-8" variant="outline">
+              <CSVLink data={exportData}>Export to CSV</CSVLink>
+            </Button>
 
-          <Link href="/dashboard/payments/newpayment">
-            <Button className="h-8">Add New</Button>
-          </Link>
-        </div>
-      }
-    />
+            <Link href="/dashboard/payments/newpayment">
+              <Button className="h-8">Add New</Button>
+            </Link>
+          </div>
+        }
+      />
+    </>
   );
 };
 

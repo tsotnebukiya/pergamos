@@ -68,7 +68,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
               cardClass1="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-2 "
             />
             {data.brokers.length > 0 ? (
-              <Card className="col-span-1 border-none shadow-none md:col-span-2 lg:col-span-5 lg:col-start-1 lg:row-span-2">
+              <Card className="col-span-1 border-none bg-transparent shadow-none md:col-span-2 lg:col-span-5 lg:col-start-1 lg:row-span-2">
                 <CardHeader className="px-0">
                   <CardTitle>Brokers</CardTitle>
                 </CardHeader>

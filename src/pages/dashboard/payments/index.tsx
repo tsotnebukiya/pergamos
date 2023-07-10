@@ -7,6 +7,8 @@ import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
 import SSITable from "pergamos/components/ssiComponents/ssiTable";
 import PaymentsTable from "pergamos/components/paymentComponents/PaymentsTable";
+import { TableCellsIcon } from "@heroicons/react/24/outline";
+import Spinner from "pergamos/components/UI/Spinner";
 
 const PaymentsTablePage: NextPageWithLayout = () => {
   const { data } = api.payments.getAll.useQuery();
@@ -17,6 +19,7 @@ const PaymentsTablePage: NextPageWithLayout = () => {
         pages={[{ name: "Payments", href: "/dashboard/payments" }]}
       />
       <div className="container mx-auto py-6">
+        {/* {!data ? <Spinner /> : <PaymentsTable data={data} />} */}
         <PaymentsTable data={data} />
       </div>
     </main>

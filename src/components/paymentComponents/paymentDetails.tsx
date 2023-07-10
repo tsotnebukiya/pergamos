@@ -25,7 +25,17 @@ const PaymentDetails: React.FC<{
           <div className="flex flex-col gap-4">
             <div className="flex justify-between">
               <span>Status</span>
-              <Badge variant="outline">{data.status}</Badge>
+              <Badge
+                variant={
+                  data.status === "APPROVED"
+                    ? "default"
+                    : data.status === "REJECTED"
+                    ? "destructive"
+                    : "outline"
+                }
+              >
+                {data.status}
+              </Badge>
             </div>
             <div className="flex justify-between">
               <span>Broker</span>

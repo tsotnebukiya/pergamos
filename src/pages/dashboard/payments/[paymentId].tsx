@@ -1,4 +1,4 @@
-import { type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import type { NextPageWithLayout } from "pergamos/utils/types";
 import DashboardLayout from "pergamos/components/layouts/DashboardLayout";
 import BreadCrumbs from "pergamos/components/Breadcrumbs";
@@ -14,10 +14,36 @@ import { TabsTrigger } from "pergamos/components/UI/Tabs";
 import { TabsContent } from "pergamos/components/UI/Tabs";
 import PaymentGeneral from "pergamos/components/paymentComponents/paymentGeneral";
 import PaymentInstructions from "pergamos/components/paymentComponents/paymentInstructions";
+import PaymentModal from "pergamos/components/paymentComponents/paymentModal";
+import { Table } from "lucide-react";
 
 const SSIListPage: NextPageWithLayout = () => {
   const query = useRouter().query.paymentId;
+  const [modalOpen, setmodalOpen] = useState(false);
+  const [modalType, setmodalType] = useState<
+    "cancel" | "sendForApproval" | "reject" | "approve" | "approveOVT"
+  >("cancel");
   const { data } = api.payments.getOne.useQuery({ id: Number(query) });
+  const cancelHandler = () => {
+    setmodalType("cancel");
+    setmodalOpen(true);
+  };
+  const rejectHandler = () => {
+    setmodalType("reject");
+    setmodalOpen(true);
+  };
+  const sendForApprovalHandler = () => {
+    setmodalType("sendForApproval");
+    setmodalOpen(true);
+  };
+  const approveHandler = () => {
+    setmodalType("approve");
+    setmodalOpen(true);
+  };
+  const approveOVTHandler = () => {
+    setmodalType("approveOVT");
+    setmodalOpen(true);
+  };
   if (!data) return null;
   return (
     <main>
@@ -32,7 +58,46 @@ const SSIListPage: NextPageWithLayout = () => {
           <h2 className="text-3xl font-bold tracking-tight">
             Payment #{data.id}
           </h2>
-          {data.status === "PENDING" ? <Button size="sm">Activate</Button> : ""}
+          <div className="flex gap-2">
+            <div>
+              {data.status === "PENDING" ? (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => cancelHandler()}
+                >
+                  Cancel
+                </Button>
+              ) : data.status === "REJECTED" ? (
+                ""
+              ) : (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => rejectHandler()}
+                >
+                  Reject
+                </Button>
+              )}
+            </div>
+            <div>
+              {data.status === "PENDING" && (
+                <Button size="sm" onClick={() => sendForApprovalHandler()}>
+                  Send for Approval
+                </Button>
+              )}
+              {data.status === "SENTFORAPPROVAL" && (
+                <Button size="sm" onClick={() => approveHandler()}>
+                  Approve
+                </Button>
+              )}
+              {data.status === "SENFOROVTAPPROVAL" && (
+                <Button size="sm" onClick={() => approveOVTHandler()}>
+                  Approve OVT
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -59,6 +124,12 @@ const SSIListPage: NextPageWithLayout = () => {
           </div>
         </div>
       </div>
+      <PaymentModal
+        open={modalOpen}
+        paymentId={data.id}
+        setOpen={setmodalOpen}
+        type={modalType}
+      />
     </main>
   );
 };

@@ -7,6 +7,7 @@ import type { GetServerSideProps } from "next";
 import { createHelpers } from "pergamos/utils/helpers";
 import BanksTable from "pergamos/components/bankComponents/BanksTable";
 import BankCreate from "pergamos/components/bankComponents/BankCreate";
+import Spinner from "pergamos/components/UI/Spinner";
 
 const BanksListPage: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false);

@@ -168,255 +168,200 @@ export const paymentsRouter = createTRPCRouter({
     });
     return payment;
   }),
-  activate: protectedProcedure
+  cancel: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const existingBroker = await ctx.prisma.broker.findUniqueOrThrow({
-        where: { id: input.id },
+      const payment = await ctx.prisma.payment.findUniqueOrThrow({
+        where: {
+          id: input.id,
+        },
       });
-      if (existingBroker.maker === ctx.session.user.id)
+      if (payment.status !== "PENDING") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Maker/Checker cannot be the same user",
+          message: "Payment can only be rejected",
         });
-      if (existingBroker.active)
+      }
+      if (payment.maker !== ctx.session.user.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Bank is already active",
+          message: "You are not authorized to cancel this payment",
         });
-      const updatedBroker = await ctx.prisma.broker.update({
+      }
+      await ctx.prisma.paymentAudit.deleteMany({
+        where: {
+          payment: input.id,
+        },
+      });
+      await ctx.prisma.payment.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
+  sendForApproval: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const payment = await ctx.prisma.payment.findUniqueOrThrow({
+        where: {
+          id: input.id,
+        },
+      });
+      if (payment.status !== "PENDING") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot send for approval at this stage",
+        });
+      }
+      if (payment.maker !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not authorized to send for approval",
+        });
+      }
+      await ctx.prisma.payment.update({
         where: {
           id: input.id,
         },
         data: {
-          active: true,
-          checker: ctx.session.user.id,
+          status: "SENTFORAPPROVAL",
         },
       });
-      if (!updatedBroker)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to activate bank",
-        });
-      return updatedBroker;
-    }),
-  amend: protectedProcedure
-    .input(
-      z.object({
-        brokerId: z.number(),
-        details: z
-          .object({
-            name: z.string().optional(),
-            market: z.string().optional(),
-            assignedTeam: z.number().optional(),
-          })
-          .refine(
-            (data) =>
-              Object.values(data).some(
-                (val) => val !== undefined && val !== null
-              ),
-            {
-              message: "At least one property must be present",
-            }
-          ),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      console.log("1");
-      const existingBroker = await ctx.prisma.bank.findFirst({
-        where: {
-          OR: [...(input.details.name ? [{ name: input.details.name }] : [])],
-        },
-      });
-      if (existingBroker) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Broker already exists",
-        });
-      }
-      console.log("2");
-      const broker = await ctx.prisma.broker.findUniqueOrThrow({
-        where: { id: input.brokerId },
-      });
-
-      if (!broker.active) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: " Broker is not active",
-        });
-      }
-      if (broker.amending) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Bank is already being amended",
-        });
-      }
-      const data = {
-        broker: input.brokerId,
-        maker: ctx.session.user.id,
-        ...(input.details.name ? { name: input.details.name } : {}),
-        ...(input.details.market ? { market: input.details.market } : {}),
-        ...(input.details.assignedTeam
-          ? { assignedTeam: input.details.assignedTeam }
-          : {}),
-      };
-      const createBrokerAudit = await ctx.prisma.brokerAudit.create({
-        data,
-      });
-      await ctx.prisma.broker.update({
-        where: {
-          id: input.brokerId,
-        },
+      await ctx.prisma.paymentAudit.create({
         data: {
-          amending: true,
+          type: "SENDFORAPPROVAL",
+          payment: payment.id,
+          maker: ctx.session.user.id,
         },
       });
-      return createBrokerAudit;
     }),
-  amendChecker: protectedProcedure
-    .input(
-      z.object({
-        brokerId: z.number(),
-        amendId: z.number(),
-        action: z.enum(["APPROVE", "REJECT"]),
-      })
-    )
+  approve: protectedProcedure
+    .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.broker.findUniqueOrThrow({
-        where: { id: input.brokerId },
+      const payment = await ctx.prisma.payment.findUniqueOrThrow({
+        where: {
+          id: input.id,
+        },
       });
-      const brokerAudit = await ctx.prisma.brokerAudit.findUniqueOrThrow({
-        where: { id: input.amendId },
-      });
-      if (brokerAudit.checker) {
+      if (payment.status !== "SENTFORAPPROVAL") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Amendment already approved",
+          message: "Cannot approve at this stage",
         });
       }
-      if (brokerAudit.maker === ctx.session.user.id) {
+      if (payment.maker === ctx.session.user.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Maker/Checker cannot be the same user",
+          message: "You are not authorized to approve this payment",
         });
       }
-      if (input.action === "REJECT") {
-        const updateBrokerAudit = await ctx.prisma.brokerAudit.update({
-          where: { id: input.amendId },
-          data: {
-            checker: ctx.session.user.id,
-            status: "REJECTED",
-          },
-        });
-        await ctx.prisma.broker.update({
+      await ctx.prisma.paymentAudit.create({
+        data: {
+          type: "APPROVEDCHECKERI",
+          payment: payment.id,
+          maker: ctx.session.user.id,
+        },
+      });
+      if (payment.amountUSD && payment.amountUSD < 1000000) {
+        await ctx.prisma.payment.update({
           where: {
-            id: input.brokerId,
+            id: input.id,
           },
           data: {
-            amending: false,
+            status: "APPROVED",
+            checkerI: ctx.session.user.id,
           },
         });
-        return updateBrokerAudit;
+
+        return payment;
       }
-      const updateBrokerAudit = await ctx.prisma.brokerAudit.update({
-        where: { id: input.amendId },
-        data: {
-          checker: ctx.session.user.id,
-          status: "APPROVED",
-        },
-      });
-      await ctx.prisma.broker.update({
+      await ctx.prisma.payment.update({
         where: {
-          id: input.brokerId,
+          id: input.id,
         },
         data: {
-          amending: false,
-          ...(brokerAudit.name ? { name: brokerAudit.name } : {}),
-          ...(brokerAudit.assignedTeam
-            ? { assignedTeam: brokerAudit.assignedTeam }
-            : {}),
-          ...(brokerAudit.market ? { market: brokerAudit.market } : {}),
+          status: "SENFOROVTAPPROVAL",
+          checkerI: ctx.session.user.id,
         },
       });
-      return updateBrokerAudit;
+      return payment;
     }),
-  createItem: protectedProcedure
-    .input(
-      z.object({
-        type: z.enum(["Email", "Phone", "Account"]),
-        values: z.array(z.string()),
-        brokerId: z.number(),
-      })
-    )
+  approveOVT: protectedProcedure
+    .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const broker = await ctx.prisma.broker.findUniqueOrThrow({
-        where: { id: input.brokerId },
+      const payment = await ctx.prisma.payment.findUniqueOrThrow({
+        where: {
+          id: input.id,
+        },
       });
-      if (!broker) {
+      if (payment.status !== "SENFOROVTAPPROVAL") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Broker does not exist",
+          message: "Cannot approve OVT at this stage",
         });
       }
-      if (!broker.active) {
+      if (
+        payment.maker === ctx.session.user.id ||
+        payment.checkerI === ctx.session.user.id
+      ) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Broker is not active",
+          message: "You are not authorized to approve OVT this payment",
         });
       }
-      if (input.type === "Email") {
-        const emails = await ctx.prisma.contactEmail.createMany({
-          data: input.values.map((value) => ({
-            broker: input.brokerId,
-            email: value,
-          })),
-        });
-        return emails;
-      }
-      if (input.type === "Account") {
-        const accounts = await ctx.prisma.brokerAccounts.createMany({
-          data: input.values.map((value) => ({
-            broker: input.brokerId,
-            account: value,
-          })),
-        });
-        return accounts;
-      }
-      if (input.type === "Phone") {
-        const phones = await ctx.prisma.contactPhone.createMany({
-          data: input.values.map((value) => ({
-            broker: input.brokerId,
-            phone: value,
-          })),
-        });
-        return phones;
-      }
+      await ctx.prisma.paymentAudit.create({
+        data: {
+          type: "APPROVEDCHECKERII",
+          payment: payment.id,
+          maker: ctx.session.user.id,
+        },
+      });
+      await ctx.prisma.payment.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: "APPROVED",
+          checkerII: ctx.session.user.id,
+        },
+      });
+      return payment;
     }),
-  deleteItem: protectedProcedure
-    .input(
-      z.object({
-        type: z.enum(["Email", "Phone", "Account"]),
-        id: z.string(),
-      })
-    )
+  reject: protectedProcedure
+    .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      if (input.type === "Email") {
-        const emails = await ctx.prisma.contactEmail.delete({
-          where: { id: input.id },
+      const payment = await ctx.prisma.payment.findUniqueOrThrow({
+        where: {
+          id: input.id,
+        },
+      });
+      if (payment.status === "REJECTED" || payment.status === "PENDING") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot reject at this stage",
         });
-        return emails;
       }
-      if (input.type === "Account") {
-        const emails = await ctx.prisma.brokerAccounts.delete({
-          where: { id: input.id },
+      if (payment.maker === ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not authorized to reject this payment",
         });
-        return emails;
       }
-      if (input.type === "Phone") {
-        const emails = await ctx.prisma.contactPhone.delete({
-          where: { id: input.id },
-        });
-        return emails;
-      }
+      await ctx.prisma.paymentAudit.create({
+        data: {
+          type: "REJECT",
+          payment: payment.id,
+          maker: ctx.session.user.id,
+        },
+      });
+      await ctx.prisma.payment.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: "REJECTED",
+        },
+      });
+      return payment;
     }),
 });

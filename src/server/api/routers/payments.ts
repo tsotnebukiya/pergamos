@@ -364,4 +364,76 @@ export const paymentsRouter = createTRPCRouter({
       });
       return payment;
     }),
+  dashboard: protectedProcedure.query(async ({ ctx }) => {
+    const payments = await ctx.prisma.payment.findMany({
+      include: {
+        ssi: {
+          select: {
+            currency: true,
+          },
+        },
+        citiTeam: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        broker: {
+          select: {
+            name: true,
+            id: true,
+            bank: true,
+          },
+        },
+      },
+    });
+    const brokerCount = await ctx.prisma.broker.count();
+    const ssiCount = await ctx.prisma.sSI.count();
+    const approvedPayments = payments.filter(
+      (payment) => payment.status === "APPROVED"
+    );
+    const pendingPayments = payments.filter(
+      (payment) =>
+        payment.status === "PENDING" ||
+        payment.status === "SENTFORAPPROVAL" ||
+        payment.status === "SENFOROVTAPPROVAL"
+    );
+    const totalVolume = approvedPayments.reduce((acc, curr) => {
+      const amount = curr.amountUSD || 0;
+      return acc + amount;
+    }, 0);
+    const totalPayments = approvedPayments.length;
+
+    const audit = await ctx.prisma.paymentAudit.findMany({
+      take: 10,
+      where: {
+        type: {
+          not: "CREATE",
+        },
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+      include: {
+        makerUser: {
+          select: {
+            name: true,
+            id: true,
+            image: true,
+          },
+        },
+      },
+    });
+    return {
+      payments,
+
+      secondaryStats: { pendingPayments, audit },
+      generalStats: {
+        brokerCount,
+        ssiCount,
+        totalVolume,
+        totalPayments,
+      },
+    };
+  }),
 });

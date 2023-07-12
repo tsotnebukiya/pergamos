@@ -99,7 +99,7 @@ const PaymentDetails: React.FC<{
             <CardTitle>Audit Trail</CardTitle>
           </CardHeader>
           <CardContent>
-            <PaymentAudit data={data} />
+            <PaymentAudit data={data.audit} />
           </CardContent>
         </Card>
       </div>

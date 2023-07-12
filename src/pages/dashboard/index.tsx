@@ -5,41 +5,45 @@ import MyChart from "pergamos/components/charts/mychart";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "pergamos/components/UI/Card";
 import PieChart from "pergamos/components/charts/PieChart";
 import HeatMap from "pergamos/components/charts/HeatMap";
 import TreeMap from "pergamos/components/charts/TreeMap";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "pergamos/components/UI/Tabs";
+import GeneralStatus from "pergamos/components/dashboardComp/GeneralStats";
+import SecondaryStats from "pergamos/components/dashboardComp/SecondaryStats";
+import Analytics from "pergamos/components/dashboardComp/Analytics";
+import { createHelpers } from "pergamos/utils/helpers";
+import { GetServerSideProps } from "next";
+import { api } from "pergamos/utils/api";
 
 const DashboardPage: NextPageWithLayout = () => {
+  const { data } = api.payments.dashboard.useQuery();
+  if (!data) return null;
   return (
     <>
-      <div className="container mx-auto  grid grid-cols-6 gap-x-16 gap-y-4 py-6">
-        <Card className="col-span-6">
-          <CardHeader>
-            <CardTitle>Daily Transaction Count</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <HeatMap />
-          </CardContent>
-        </Card>
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Payment Types</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PieChart />
-          </CardContent>
-        </Card>
-        <Card className="col-span-4 col-start-3">
-          <CardHeader>
-            <CardTitle>Top 10 Banks by Volume</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TreeMap />
-          </CardContent>
-        </Card>
+      <div className="container mx-auto py-6">
+        <Tabs defaultValue="overview">
+          <TabsList className="mb-4 mt-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="related">Analytics</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview" className="space-y-4">
+            <GeneralStatus data={data.generalStats} />
+            <SecondaryStats data={data.secondaryStats} />
+          </TabsContent>
+          <TabsContent value="related">
+            <Analytics />
+          </TabsContent>
+        </Tabs>
       </div>
     </>
   );
@@ -50,3 +54,15 @@ DashboardPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default DashboardPage;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const helper = await createHelpers(context);
+
+  await helper.payments.dashboard.prefetch();
+
+  return {
+    props: {
+      trpcState: helper.dehydrate(),
+    },
+  };
+};

@@ -39,26 +39,38 @@ import {
 import { ScrollArea } from "../UI/ScrollArea";
 import { Input } from "../UI/Input";
 
-type Payment = RouterOutputs["payments"]["getOne"];
 type Activity = RouterOutputs["payments"]["getOne"]["audit"][number];
-
+type Audit = RouterOutputs["payments"]["getOne"]["audit"];
 const AuditElement: React.FC<{
   activity: Activity;
   index: number;
   length: number;
-}> = ({ activity, index, length }) => {
+  dashboard?: boolean;
+}> = ({ activity, index, length, dashboard }) => {
   const getRelativeTimeAgo = moment(activity.timestamp).fromNow();
   return (
     <li className="relative flex gap-x-4">
-      <div
-        className={cn(
-          index === length - 1 ? "h-6" : "-bottom-6",
-          "absolute left-0 top-0 flex w-6 justify-center"
-        )}
-      >
-        <div className="w-px bg-border" />
-      </div>
+      {!dashboard && (
+        <div
+          className={cn(
+            index === length - 1 ? "h-6" : "-bottom-6",
+            "absolute left-0 top-0 flex w-6 justify-center"
+          )}
+        >
+          <div className="w-px bg-border" />
+        </div>
+      )}
 
+      {dashboard && (
+        <Link
+          href={`dashboard/payments/${activity.payment}`}
+          className="items-start"
+        >
+          <Button variant="link" className="mr-6 h-0 w-20 items-start p-0">
+            PM-{activity.payment}
+          </Button>
+        </Link>
+      )}
       <>
         <div className="justify-cente relative flex h-6 w-6 flex-none items-center">
           {activity.type === "CREATE" && (
@@ -77,8 +89,8 @@ const AuditElement: React.FC<{
             <Send className="h-6 w-6" aria-hidden="true" />
           )}
         </div>
-        <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500">
-          <span className="font-medium text-gray-900">
+        <p className="flex-auto py-0.5 text-xs leading-5">
+          <span className="font-medium">
             <Link
               href={`dashboard/users/${activity.makerUser.id}`}
               className="items-start"
@@ -87,12 +99,12 @@ const AuditElement: React.FC<{
                 {activity.makerUser.name}
               </Button>
             </Link>
-          </span>{" "}
-          {activity.type === "CREATE" && "created payment"}
-          {activity.type === "SENDFORAPPROVAL" && "sent for approval"}
-          {activity.type === "APPROVEDCHECKERI" && "approved I"}
-          {activity.type === "APPROVEDCHECKERII" && "approved II"}
-          {activity.type === "REJECT" && "rejected payment"}
+          </span>
+          {activity.type === "CREATE" && " created payment"}
+          {activity.type === "SENDFORAPPROVAL" && " sent for approval"}
+          {activity.type === "APPROVEDCHECKERI" && " approved payment"}
+          {activity.type === "APPROVEDCHECKERII" && " approved OVT"}
+          {activity.type === "REJECT" && " rejected payment"}
         </p>
         <TooltipProvider>
           <Tooltip>
@@ -106,13 +118,16 @@ const AuditElement: React.FC<{
     </li>
   );
 };
-const PaymentAudit: React.FC<{ data: Payment }> = ({ data }) => {
-  const auditArr = data.audit.sort(
+const PaymentAudit: React.FC<{ data: Audit; dashboard?: boolean }> = ({
+  data,
+  dashboard,
+}) => {
+  const auditArr = data.sort(
     (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
   );
   return (
     <>
-      <ScrollArea className="h-[175px] ">
+      {dashboard ? (
         <ul role="list" className="space-y-6">
           {auditArr.map((value, index) => (
             <AuditElement
@@ -120,10 +135,25 @@ const PaymentAudit: React.FC<{ data: Payment }> = ({ data }) => {
               index={index}
               key={index}
               length={auditArr.length}
+              dashboard={dashboard}
             />
           ))}
         </ul>
-      </ScrollArea>
+      ) : (
+        <ScrollArea className="h-[175px]">
+          <ul role="list" className="space-y-6">
+            {auditArr.map((value, index) => (
+              <AuditElement
+                activity={value}
+                index={index}
+                key={index}
+                length={auditArr.length}
+                dashboard={dashboard}
+              />
+            ))}
+          </ul>
+        </ScrollArea>
+      )}
     </>
   );
 };

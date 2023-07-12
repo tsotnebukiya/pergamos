@@ -38,6 +38,7 @@ interface DataTableProps<TData extends { id: string | number }, TValue> {
   selecting?: boolean;
   filters?: FilterOption[];
   actions?: React.ReactNode;
+  hideToolbar?: boolean;
   view: boolean;
   id?: boolean;
 }
@@ -52,6 +53,7 @@ export function DataTable<
   selecting,
   filters = [],
   actions,
+  hideToolbar,
   broker,
   link,
   view,
@@ -94,13 +96,16 @@ export function DataTable<
   });
   return (
     <div className="space-y-4">
-      <DataTableToolbar
-        view={view}
-        table={table}
-        actions={actions}
-        id={id}
-        {...(filters.length > 0 && { filters })}
-      />
+      {!hideToolbar && (
+        <DataTableToolbar
+          view={view}
+          table={table}
+          actions={actions}
+          id={id}
+          {...(filters.length > 0 && { filters })}
+        />
+      )}
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>

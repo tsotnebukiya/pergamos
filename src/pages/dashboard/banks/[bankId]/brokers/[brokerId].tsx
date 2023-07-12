@@ -72,9 +72,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
           <TabsContent value="overview">
             <BrokerOverview broker={data} />
           </TabsContent>
-          <TabsContent value="related">
-            <BrokerRelated />
-          </TabsContent>
+          <TabsContent value="related">{/* <BrokerRelated /> */}</TabsContent>
         </Tabs>
       </div>
       {activateOpen && (

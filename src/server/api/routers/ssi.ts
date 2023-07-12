@@ -51,6 +51,7 @@ export const ssiRouter = createTRPCRouter({
   createOne: protectedProcedure
     .input(ssiSchema)
     .mutation(async ({ ctx, input }) => {
+      console.log(input.backup.name, input.backup.type, input.backupTag);
       const file = await ctx.prisma.file.create({
         data: {
           name: input.backup.name,
@@ -188,7 +189,7 @@ export const ssiRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const file = await ctx.prisma.file.findUniqueOrThrow({
         where: {
-          s3Id: input.id,
+          name: input.id,
         },
       });
       const url = (await getDownloadPromise(file.name)) as string;

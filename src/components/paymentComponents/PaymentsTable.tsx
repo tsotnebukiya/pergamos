@@ -189,18 +189,22 @@ const columns = [
       const status = props.getValue();
       let Icon: Icon;
       let statusText: string;
+      let color: string;
       if (status === "APPROVED") {
         Icon = CheckCircledIcon;
         statusText = "Approved";
+        color = "text-green-500";
       } else if (status === "REJECTED") {
         Icon = CrossCircledIcon;
         statusText = "Rejected";
+        color = "text-red-500";
       } else {
         Icon = StopwatchIcon;
         statusText = "Pending";
+        color = "";
       }
       return (
-        <div className="flex max-w-[300px] gap-2 truncate">
+        <div className={`flex max-w-[300px] gap-2 truncate ${color}`}>
           <Icon />
           <span>{statusText}</span>
         </div>
@@ -208,7 +212,14 @@ const columns = [
     },
     filterFn: (row, id, value) => {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const status = row.getValue(id) as string;
+      let status = row.getValue(id) as string;
+      if (status === "APPROVED") {
+        status = "Approved";
+      } else if (status === "REJECTED") {
+        status = "Rejected";
+      } else {
+        status = "Pending";
+      }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
       return value.includes(status.toLowerCase());
     },

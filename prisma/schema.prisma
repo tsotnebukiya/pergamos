@@ -273,7 +273,7 @@ model SSI{
 model File{
     id        String   @id @default(cuid())
     ssis      SSI[]    @relation("FileToSSI")
-    s3Id      String  @unique
+    s3Id      String 
     name      String @unique
     type      String
 }

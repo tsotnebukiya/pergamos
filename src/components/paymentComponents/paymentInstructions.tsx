@@ -41,7 +41,7 @@ const PaymentInstructions: React.FC<{ data: Payment }> = ({ data }) => {
   const downloadHandler = () => {
     setDownloading(true);
     if (data?.ssi.assignedFile.name) {
-      mutate({ id: data?.ssi.assignedFile.s3Id });
+      mutate({ id: data?.ssi.assignedFile.name });
     }
   };
   return (

@@ -100,8 +100,9 @@ const CommandMenu: React.FC<{
       </CommandGroup> */}
         </CommandList>
       </CommandDialog>
-      <BankCreate open={openBank} setOpen={setOpenBank} />
-      <BrokerCreate open={openBroker} setOpen={setOpenBroker} />
+      {openBank && <BankCreate open={openBank} setOpen={setOpenBank} />}
+
+      {openBroker && <BrokerCreate open={openBroker} setOpen={setOpenBroker} />}
     </>
   );
 };

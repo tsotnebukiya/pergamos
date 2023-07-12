@@ -120,13 +120,13 @@ const SSIPage: NextPageWithLayout = () => {
   });
   const { mutate } = api.ssi.createOne.useMutation({
     onSuccess: async (data) => {
+      await router.push(`/dashboard/ssi/${data.id}`);
       setSubmitting(false);
       toast({
         variant: "default",
         title: "Success",
         description: "SSI created successfully",
       });
-      await router.push(`/dashboard/ssi/${data.id}`);
     },
     onError: (error) => {
       setSubmitting(false);
@@ -298,7 +298,7 @@ const SSIPage: NextPageWithLayout = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="field58Institution"
+                    name="field58Account"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Beneficiary Account </FormLabel>

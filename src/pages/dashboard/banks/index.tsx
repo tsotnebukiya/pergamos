@@ -12,6 +12,7 @@ import Spinner from "pergamos/components/UI/Spinner";
 const BanksListPage: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false);
   const { data } = api.banks.getAll.useQuery();
+
   if (!data) return null;
   return (
     <main>

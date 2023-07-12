@@ -1,9 +1,9 @@
-import { DollarSign, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card";
 import { Badge } from "../UI/Badge";
 import { Button } from "../UI/Button";
 import Link from "next/link";
 import { type RouterOutputs } from "pergamos/utils/api";
+import { ArrowLeftRight, DollarSign } from "lucide-react";
 
 type Bank = RouterOutputs["banks"]["getOne"];
 
@@ -93,7 +93,7 @@ const BankDetails: React.FC<{
             <CardTitle className="text-sm font-medium">
               Total Transactions
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {transactions ? (

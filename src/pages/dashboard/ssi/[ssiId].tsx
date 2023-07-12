@@ -54,7 +54,7 @@ const SSIPage: NextPageWithLayout = () => {
   const downloadHandler = () => {
     setDownloading(true);
     if (data?.assignedFile.name) {
-      mutate({ id: data?.assignedFile.s3Id });
+      mutate({ id: data?.assignedFile.name });
     }
   };
   if (!data) return null;

@@ -28,6 +28,7 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
   const [openActivate, setOpenActivate] = useState(false);
   const query = useRouter().query.bankId as string;
   const { data } = api.banks.getOne.useQuery({ id: Number(query) });
+  console.log(data);
   if (!data) return null;
   return (
     <main>
@@ -62,8 +63,8 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
             <BankDetails
               bank={data}
-              transactions={100}
-              volume={100000}
+              transactions={data.totalPaymentCount}
+              volume={data.totalPaymentUSD}
               cardClass2="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-1 space-y-4"
               cardClass1="col-span-1 md:col-span-1 lg:col-span-2 lg:col-start-6 lg:row-start-2 "
             />

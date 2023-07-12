@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "pergamos/components/UI/Card";
 import axios from "axios";
-import { z } from "zod";
+import { array, z } from "zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -47,6 +47,8 @@ import { CalendarIcon } from "lucide-react";
 import { Calendar } from "pergamos/components/UI/Calendar";
 import { useRouter } from "next/router";
 import { toast } from "pergamos/hooks/useToast";
+
+const numbersArray = Array.from({ length: 93 }, (_, index) => index + 9);
 
 const formSchema = z.object({
   assignedBroker: z
@@ -100,7 +102,7 @@ const NewPaymentPage: NextPageWithLayout = () => {
       receiverInformation: "",
     },
   });
-
+  const { mutate: mutateDummy } = api.payments.approveOVT.useMutation();
   const { mutate } = api.payments.create.useMutation({
     onSuccess: async (data) => {
       await router.push(`/dashboard/payments/${data.id}`);
@@ -182,9 +184,15 @@ const NewPaymentPage: NextPageWithLayout = () => {
       amount: Number(parseFloat(data.amount.replace(/,/g, ""))),
     });
   };
+  const dummy = () => {
+    numbersArray.forEach((el) => {
+      mutateDummy({ id: el });
+    });
+  };
   return (
     <main>
       <BreadCrumbs pages={[{ name: "SSI", href: "/dashboard/ssi" }]} />
+      <button onClick={dummy}>Dummy</button>
       <div className="container mx-auto flex flex-col gap-8 py-6">
         <Stepper status01={stepState.step01} status02={stepState.step02} />
         <Card>

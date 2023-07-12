@@ -12,6 +12,7 @@ export const banksRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
+
         select: {
           id: true,
           name: true,
@@ -35,6 +36,16 @@ export const banksRouter = createTRPCRouter({
                   account: true,
                 },
               },
+              payments: {
+                select: {
+                  amountUSD: true,
+                },
+              },
+              _count: {
+                select: {
+                  payments: true,
+                },
+              },
             },
           },
           audits: {
@@ -54,7 +65,27 @@ export const banksRouter = createTRPCRouter({
           },
         },
       });
-      return bank;
+      const totalPaymentUSD = bank.brokers.reduce((sum, broker) => {
+        const brokerPaymentSum = broker.payments.reduce(
+          (brokerSum, payment) => {
+            if (
+              payment.amountUSD !== null &&
+              typeof payment.amountUSD === "number"
+            ) {
+              return brokerSum + payment.amountUSD;
+            }
+            return brokerSum;
+          },
+          0
+        );
+
+        return sum + brokerPaymentSum;
+      }, 0);
+
+      const totalPaymentCount = bank.brokers.reduce((sum, broker) => {
+        return sum + broker._count.payments;
+      }, 0);
+      return { ...bank, totalPaymentUSD, totalPaymentCount };
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const bank = await ctx.prisma.bank.findMany({

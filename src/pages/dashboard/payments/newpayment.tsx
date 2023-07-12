@@ -102,7 +102,6 @@ const NewPaymentPage: NextPageWithLayout = () => {
       receiverInformation: "",
     },
   });
-  const { mutate: mutateDummy } = api.payments.approveOVT.useMutation();
   const { mutate } = api.payments.create.useMutation({
     onSuccess: async (data) => {
       await router.push(`/dashboard/payments/${data.id}`);
@@ -184,15 +183,9 @@ const NewPaymentPage: NextPageWithLayout = () => {
       amount: Number(parseFloat(data.amount.replace(/,/g, ""))),
     });
   };
-  const dummy = () => {
-    numbersArray.forEach((el) => {
-      mutateDummy({ id: el });
-    });
-  };
   return (
     <main>
       <BreadCrumbs pages={[{ name: "SSI", href: "/dashboard/ssi" }]} />
-      <button onClick={dummy}>Dummy</button>
       <div className="container mx-auto flex flex-col gap-8 py-6">
         <Stepper status01={stepState.step01} status02={stepState.step02} />
         <Card>

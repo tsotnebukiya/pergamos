@@ -18,6 +18,7 @@ const config = {
   parserOptions: {
     project: path.join(__dirname, "tsconfig.json"),
   },
+  ignorePatterns: ["src/components/charts/westeros.js"],
   plugins: ["@typescript-eslint"],
   extends: ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"],
   rules: {

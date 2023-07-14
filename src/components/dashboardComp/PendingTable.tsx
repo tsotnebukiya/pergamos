@@ -22,7 +22,8 @@ type Icon = React.ForwardRefExoticComponent<
 >;
 
 // type Payment = RouterOutputs["payments"]["getAll"][number];
-type Payment = RouterOutputs["payments"]["dashboard"]["payments"][number];
+type Payment =
+  RouterOutputs["payments"]["dashboard"]["secondaryStats"]["pendingPayments"][number];
 
 const columnHelper = createColumnHelper<Payment>();
 

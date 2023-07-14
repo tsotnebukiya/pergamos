@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
-import { westerosTheme } from "./westeros";
+import { westerosTheme, darkWesterosTheme } from "./westeros";
+import { useTheme } from "next-themes";
 type EChartsOption = echarts.EChartsOption;
 
-echarts.registerTheme("westerosDefault", westerosTheme);
+echarts.registerTheme("westeros", westerosTheme);
+echarts.registerTheme("westerosDark", darkWesterosTheme);
 
 const MyChart: React.FC<{ newOption: EChartsOption; height: number }> = ({
   newOption,
@@ -12,14 +14,27 @@ const MyChart: React.FC<{ newOption: EChartsOption; height: number }> = ({
   const chartRef = useRef<HTMLDivElement>(null);
   const [chart, setChart] = useState<echarts.ECharts | null>(null);
   const [option, setOption] = useState<EChartsOption | null>(null);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     if (chartRef.current && !chart) {
-      const myChart = echarts.init(chartRef.current, "westerosDefault"); // Specify the theme name when initializing the chart
+      const myChart = echarts.init(
+        chartRef.current,
+        `${resolvedTheme === "dark" ? "westerosDark" : "westeros"}`
+      ); // Specify the theme name when initializing the chart
       setChart(myChart);
     }
-  }, [chart]);
-
+  }, [chart, resolvedTheme]);
+  useEffect(() => {
+    if (chart && chartRef.current && resolvedTheme) {
+      const themeName = `${
+        resolvedTheme === "dark" ? "westerosDark" : "westeros"
+      }`;
+      chart.dispose(); // Dispose the previous chart instance
+      const newChart = echarts.init(chartRef.current, themeName);
+      setChart(newChart);
+    }
+  }, [resolvedTheme]);
   useEffect(() => {
     if (chart && option) {
       chart.setOption(option);

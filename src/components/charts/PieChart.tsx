@@ -1,7 +1,10 @@
+import { RouterOutputs } from "pergamos/utils/api";
 import MyChart from "./mychart";
 type EChartsOption = echarts.EChartsOption;
 
-const PieChart: React.FC = () => {
+type PieChart = RouterOutputs["payments"]["dashboard"]["analytics"]["pieChart"];
+
+const PieChart: React.FC<{ data: PieChart }> = ({ data }) => {
   const newOption: EChartsOption = {
     tooltip: {
       trigger: "item",
@@ -9,7 +12,7 @@ const PieChart: React.FC = () => {
     series: [
       {
         width: "100%",
-        name: "Access From",
+        name: "Citi Team",
         type: "pie",
         radius: ["20%", "90%"],
         avoidLabelOverlap: false,
@@ -21,16 +24,12 @@ const PieChart: React.FC = () => {
         label: {
           show: true,
           position: "inner",
+          formatter: "{b}\n{d}%",
         },
         labelLine: {
           show: false,
         },
-        data: [
-          { value: 735, name: "Direct" },
-          { value: 580, name: "Email" },
-          { value: 484, name: "Union Ads" },
-          { value: 300, name: "Video Ads" },
-        ],
+        data: data.cititeams,
       },
     ],
   };

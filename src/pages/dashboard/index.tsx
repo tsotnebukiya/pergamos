@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "pergamos/components/UI/Card";
 import PieChart from "pergamos/components/charts/PieChart";
-import HeatMap from "pergamos/components/charts/HeatMap";
+import HeatMap from "pergamos/components/charts/BarChart";
 import TreeMap from "pergamos/components/charts/TreeMap";
 import {
   Tabs,
@@ -27,10 +27,11 @@ import { api } from "pergamos/utils/api";
 
 const DashboardPage: NextPageWithLayout = () => {
   const { data } = api.payments.dashboard.useQuery();
+  console.log(data);
   if (!data) return null;
   return (
     <>
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto">
         <Tabs defaultValue="overview">
           <TabsList className="mb-4 mt-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -41,7 +42,7 @@ const DashboardPage: NextPageWithLayout = () => {
             <SecondaryStats data={data.secondaryStats} />
           </TabsContent>
           <TabsContent value="related">
-            <Analytics />
+            <Analytics data={data.analytics} />
           </TabsContent>
         </Tabs>
       </div>

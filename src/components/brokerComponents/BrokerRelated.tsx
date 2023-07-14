@@ -1,7 +1,7 @@
 const Related: React.FC = () => {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid grid-cols-4 gap-4 md:grid-cols-2 lg:grid-cols-7">
         <div className="col-span-1 border-none shadow-none md:col-span-2 lg:col-span-5 lg:col-start-1 lg:row-span-2">
           Later
         </div>

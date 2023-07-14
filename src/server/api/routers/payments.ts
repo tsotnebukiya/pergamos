@@ -383,6 +383,11 @@ export const paymentsRouter = createTRPCRouter({
             name: true,
             id: true,
             bank: true,
+            bankId: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
@@ -424,15 +429,86 @@ export const paymentsRouter = createTRPCRouter({
         },
       },
     });
-    return {
-      payments,
+    const types = ["CLAIM", "LENDING", "TAX", "OTHER"];
+    const currentDate = new Date();
+    const fourMonthsAgo = new Date();
+    fourMonthsAgo.setMonth(currentDate.getMonth() - 3);
+    const months = Array(4)
+      .fill(0)
+      .map((_, index) => {
+        const month = new Date(
+          fourMonthsAgo.getFullYear(),
+          fourMonthsAgo.getMonth() + index
+        );
+        return month.toLocaleString("en-us", { month: "long" });
+      });
 
+    const purposeArray = [
+      [
+        "product",
+        ...Array(4)
+          .fill(0)
+          .map((_, index) => {
+            const month = new Date(
+              fourMonthsAgo.getFullYear(),
+              fourMonthsAgo.getMonth() + index
+            );
+            return month.toLocaleString("en-us", { month: "long" });
+          }),
+      ],
+      ...types.map((type) => [
+        type,
+        ...Array(4)
+          .fill(0)
+          .map((_, index) => {
+            const month = new Date(
+              fourMonthsAgo.getFullYear(),
+              fourMonthsAgo.getMonth() + index
+            );
+            const filteredObjects = payments.filter(
+              (obj) =>
+                obj.purpose === type &&
+                obj.valueDate.getMonth() === month.getMonth() &&
+                obj.valueDate.getFullYear() === month.getFullYear()
+            );
+            return filteredObjects.length;
+          }),
+      ]),
+    ];
+    const citiTeams = [...new Set(payments.map((obj) => obj.citiTeam.name))];
+    const cititeams = citiTeams.map((citiTeam) => {
+      const count = approvedPayments.filter(
+        (obj) => obj.citiTeam.name === citiTeam
+      ).length;
+      return { value: count, name: citiTeam };
+    });
+    const bankGroups: { [key: string]: number } = {};
+
+    payments.forEach((obj) => {
+      const bank = obj.broker.bankId.name;
+      if (!bankGroups[bank]) {
+        bankGroups[bank] = 0;
+      }
+      bankGroups[bank] += obj.amountUSD as number;
+    });
+
+    const sortedBanks = Object.entries(bankGroups)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([bank, amount]) => ({ value: Math.round(amount), name: bank }));
+
+    return {
       secondaryStats: { pendingPayments, audit },
       generalStats: {
         brokerCount,
         ssiCount,
         totalVolume,
         totalPayments,
+      },
+      analytics: {
+        barChart: { purposeArray, months },
+        pieChart: { cititeams },
+        treemap: { sortedBanks },
       },
     };
   }),

@@ -1,25 +1,29 @@
+import { RouterOutputs } from "pergamos/utils/api";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card";
-import HeatMap from "../charts/HeatMap";
+import BarChart from "../charts/BarChart";
 import PieChart from "../charts/PieChart";
 import TreeMap from "../charts/TreeMap";
 
-const Analytics = () => {
+type Payment = RouterOutputs["payments"]["dashboard"]["analytics"];
+
+const Analytics: React.FC<{ data: Payment }> = ({ data }) => {
+  console.log(data.pieChart.cititeams);
   return (
     <div className="grid grid-cols-6 gap-x-16 gap-y-4">
       <Card className="col-span-6">
-        <CardHeader>
-          <CardTitle>Daily Transaction Count</CardTitle>
+        <CardHeader className="pb-0">
+          <CardTitle>Monthly Transaction Count</CardTitle>
         </CardHeader>
-        <CardContent>
-          <HeatMap />
+        <CardContent className="p-0">
+          <BarChart data={data.barChart} />
         </CardContent>
       </Card>
       <Card className="col-span-2">
         <CardHeader>
-          <CardTitle>Payment Types</CardTitle>
+          <CardTitle>Payment Type Chart</CardTitle>
         </CardHeader>
         <CardContent>
-          <PieChart />
+          <PieChart data={data.pieChart} />
         </CardContent>
       </Card>
       <Card className="col-span-4 col-start-3">
@@ -27,7 +31,7 @@ const Analytics = () => {
           <CardTitle>Top 10 Banks by Volume</CardTitle>
         </CardHeader>
         <CardContent>
-          <TreeMap />
+          <TreeMap data={data.treemap} />
         </CardContent>
       </Card>
     </div>

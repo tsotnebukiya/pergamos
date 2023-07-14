@@ -1,10 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { RouterOutputs } from "pergamos/utils/api";
 import MyChart from "./mychart";
 type EChartsOption = echarts.EChartsOption;
 import * as echarts from "echarts";
 
-const TreeMap: React.FC = () => {
+type TreeMap = RouterOutputs["payments"]["dashboard"]["analytics"]["treemap"];
+
+const TreeMap: React.FC<{ data: TreeMap }> = ({ data }) => {
+  const totalValue = data.sortedBanks.reduce(
+    (sum, bank) => sum + bank.value,
+    0
+  );
+
   const newOption: EChartsOption = {
     tooltip: {
       trigger: "item",
@@ -14,49 +22,35 @@ const TreeMap: React.FC = () => {
         tooltip: {
           position: "inside",
           show: true,
-
           trigger: "item",
           triggerOn: "mousemove",
-          formatter: `{b}: {c}`,
+          formatter: (params) => {
+            const value = params.value as number;
+            const formattedValue = new Intl.NumberFormat("en-US", {
+              maximumFractionDigits: 0,
+              style: "currency",
+              currency: "USD",
+            }).format(value);
+            return `${params.name}: ${formattedValue}`;
+          },
         },
         breadcrumb: {
           show: false,
+        },
+        label: {
+          show: true,
+          formatter: (params) => {
+            const value = params.value as number;
+            const percent = (value / totalValue) * 100;
+            return `${params.name}: ${percent.toFixed(2)}%`;
+          },
         },
         roam: false,
         nodeClick: false,
         width: "100%",
         height: "100%",
         type: "treemap",
-        data: [
-          {
-            name: "JP Morgan",
-            value: 423,
-          },
-          {
-            name: "Goldman Sachs",
-            value: 231,
-          },
-          {
-            name: "Barclays",
-            value: 200,
-          },
-          {
-            name: "BNY Mellon",
-            value: 167,
-          },
-          {
-            name: "HSBC",
-            value: 150,
-          },
-          {
-            name: "Paribas",
-            value: 100,
-          },
-          {
-            name: "Bank Of America",
-            value: 20,
-          },
-        ],
+        data: data.sortedBanks,
       },
     ],
   };

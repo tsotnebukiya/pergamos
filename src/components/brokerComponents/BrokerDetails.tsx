@@ -39,7 +39,7 @@ const BrokerDetails: React.FC<{
 
             <div className="flex justify-between">
               <span>Associated Team</span>
-              <Link href={`/dashboard/users/${broker.citiTeam.id}`}>
+              <Link href={`/dashboard/teams/${broker.citiTeam.id}`}>
                 <Button variant="link" className="h-10 items-start p-0">
                   {broker.citiTeam.name}
                 </Button>
@@ -63,7 +63,7 @@ const BrokerDetails: React.FC<{
             <div className="flex justify-between">
               <span>Created By</span>
               <Link
-                href={`dashboard/users/${broker.makerUser.id}`}
+                href={`/dashboard/users/${broker.makerUser.id}`}
                 className="items-start"
               >
                 <Button variant="link" className="h-0 items-start p-0">
@@ -75,7 +75,7 @@ const BrokerDetails: React.FC<{
               <div className="flex justify-between">
                 <span>Approved By</span>
 
-                <Link href={`dashboard/users/${broker.checkerUser.id}`}>
+                <Link href={`/dashboard/users/${broker.checkerUser.id}`}>
                   <Button variant="link" className="h-10 items-start p-0">
                     {broker.checkerUser.name}
                   </Button>

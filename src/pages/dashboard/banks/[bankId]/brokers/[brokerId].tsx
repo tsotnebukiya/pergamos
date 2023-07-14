@@ -64,16 +64,19 @@ const BrokerOverviewPage: NextPageWithLayout = () => {
             </Button>
           )}
         </div>
-        <Tabs defaultValue="overview">
+        <BrokerOverview broker={data} />
+        {/* <Tabs defaultValue="overview">
           <TabsList className="mb-4 mt-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="related">Related</TabsTrigger>
           </TabsList>
           <TabsContent value="overview">
-            <BrokerOverview broker={data} />
+            
           </TabsContent>
-          <TabsContent value="related">{/* <BrokerRelated /> */}</TabsContent>
-        </Tabs>
+          <TabsContent value="related">
+            <BrokerRelated />
+          </TabsContent>
+        </Tabs> */}
       </div>
       {activateOpen && (
         <BrokerActivate

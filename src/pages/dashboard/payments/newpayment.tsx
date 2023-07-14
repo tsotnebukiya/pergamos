@@ -273,10 +273,10 @@ const NewPaymentPage: NextPageWithLayout = () => {
                           <ComboBox
                             fieldValue={field.value}
                             array={[
-                              { value: "claim", label: "Claim" },
-                              { value: "lending", label: "Lending" },
-                              { value: "tax", label: "Tax" },
-                              { value: "other", label: "Other" },
+                              { value: "CLAIM", label: "Claim" },
+                              { value: "LENDING", label: "Lending" },
+                              { value: "TAX", label: "Tax" },
+                              { value: "OTHER", label: "Other" },
                             ]}
                             name="purpose"
                             onSelect={(value) =>
